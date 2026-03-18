@@ -72,15 +72,11 @@ export class UIScene extends Phaser.Scene {
     );
 
     // Turnip Icon
-    const turnipIcon = this.add.sprite(
+    this.add.sprite(
       this.UI_CENTER_X - 60,
       this.INVENTORY_Y,
       "ui_turnip",
     );
-    if (turnipIcon.width > 0) {
-      const scale = 80 / turnipIcon.width;
-      turnipIcon.setScale(scale);
-    }
 
     this.inventoryText = this.add
       .text(this.UI_CENTER_X + 20, this.INVENTORY_Y, "x5", STYLES.INVENTORY)

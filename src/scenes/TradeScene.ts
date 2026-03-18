@@ -115,9 +115,6 @@ export class TradeScene extends Phaser.Scene {
 
             // Icon
             const icon = this.add.sprite(200, currentY, item.icon);
-            if (icon.width > 0) {
-                icon.setScale(100 / icon.width);
-            }
             this.uiContainer.add(icon);
 
             // Inventory Count
@@ -179,9 +176,6 @@ export class TradeScene extends Phaser.Scene {
 
             // Icon
             const icon = this.add.sprite(200, currentY, item.icon);
-            if (icon.width > 0) {
-                icon.setScale(100 / icon.width);
-            }
             this.uiContainer.add(icon);
 
             // Inventory Count
