@@ -11,6 +11,7 @@ export class TradeScene extends Phaser.Scene {
     
     // UI Elements
     private goldText!: Phaser.GameObjects.Text;
+    private goldIcon!: Phaser.GameObjects.Sprite;
     private tabBuyBtn!: Phaser.GameObjects.Text;
     private tabSellBtn!: Phaser.GameObjects.Text;
     
@@ -35,9 +36,11 @@ export class TradeScene extends Phaser.Scene {
         this.add.text(360, 300, 'HANDEL', STYLES.TITLE).setOrigin(0.5);
 
         // Gold Display
-        this.goldText = this.add.text(600, 300, 'Gold: 0', {
+        this.goldIcon = this.add.sprite(600, 300, 'ui_gold').setOrigin(1, 0.5);
+        this.goldIcon.setScale(60 / this.goldIcon.width);
+        this.goldText = this.add.text(this.goldIcon.x - this.goldIcon.displayWidth - 10, 300, '0', {
             ...STYLES.GOLD,
-            strokeThickness: 0 // Match original look or keep stroke? Original had no stroke here.
+            strokeThickness: 0 
         }).setOrigin(1, 0.5);
 
         // Close Button
@@ -85,7 +88,7 @@ export class TradeScene extends Phaser.Scene {
     }
 
     private refresh() {
-        this.goldText.setText(`Gold: ${this.gameStateManager.gold}`);
+        this.goldText.setText(`${this.gameStateManager.gold}`);
         
         // Update Tab Styles
         const activeBg = `#${this.ACCENT_COLOR.toString(16)}`;
@@ -121,9 +124,13 @@ export class TradeScene extends Phaser.Scene {
             this.uiContainer.add(icon);
 
             // Name & Price
-            const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } });
-            const priceText = this.add.text(280, currentY + 10, `Cena: ${item.buyPrice} Gold`, STYLES.PRICE);
-            this.uiContainer.add([nameText, priceText]);
+            const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0, 0.5);
+            const priceLabel = this.add.text(280, currentY + 10, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
+            const priceValue = this.add.text(priceLabel.x + priceLabel.width, currentY + 10, `${item.buyPrice}`, STYLES.PRICE).setOrigin(0, 0.5);
+            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 15, currentY + 10, 'ui_gold').setOrigin(0, 0.5);
+            priceIcon.setScale(50 / priceIcon.width);
+            
+            this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
 
             // Buy Button
             const canAfford = this.gameStateManager.gold >= item.buyPrice;
@@ -211,8 +218,18 @@ export class TradeScene extends Phaser.Scene {
 
             // Total Value
             const totalValue = this.sellQuantity * sellPrice;
-            const totalText = this.add.text(360, currentY + 60, `Suma: ${totalValue} Gold`, STYLES.PRICE).setOrigin(0.5);
-            this.uiContainer.add(totalText);
+            const totalLabel = this.add.text(360, currentY + 60, 'Suma: ', STYLES.PRICE).setOrigin(1, 0.5);
+            const totalValueText = this.add.text(totalLabel.x, currentY + 60, `${totalValue}`, STYLES.PRICE).setOrigin(0, 0.5);
+            const totalIcon = this.add.sprite(totalValueText.x + totalValueText.width + 10, currentY + 60, 'ui_gold').setOrigin(0, 0.5);
+            totalIcon.setScale(50 / totalIcon.width);
+            
+            // Adjust label to be centered as a group
+            const totalGroupWidth = totalLabel.width + totalValueText.width + totalIcon.displayWidth + 10;
+            totalLabel.setX(360 - totalGroupWidth/2 + totalLabel.width);
+            totalValueText.setX(totalLabel.x);
+            totalIcon.setX(totalValueText.x + totalValueText.width + 10);
+
+            this.uiContainer.add([totalLabel, totalValueText, totalIcon]);
 
             // Sell Button
             const sellBtn = this.add.text(520, currentY, 'SPRZEDAJ', {

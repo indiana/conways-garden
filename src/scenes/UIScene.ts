@@ -7,6 +7,7 @@ import { STYLES } from '../constants/Styles';
 export class UIScene extends Phaser.Scene {
     private inventoryText!: Phaser.GameObjects.Text;
     private goldText!: Phaser.GameObjects.Text;
+    private goldIcon!: Phaser.GameObjects.Sprite;
     private timerGraphics!: Phaser.GameObjects.Graphics;
     
     private gameStateManager!: GameStateManager;
@@ -21,7 +22,28 @@ export class UIScene extends Phaser.Scene {
 
     create() {
         // Gold Display
-        this.goldText = this.add.text(40, 40, 'Gold: 20', STYLES.GOLD);
+        this.goldText = this.add.text(40, 40, '20', STYLES.GOLD).setOrigin(0, 0.5);
+        this.goldIcon = this.add.sprite(this.goldText.x + this.goldText.width + 10, 40, 'ui_gold').setOrigin(0, 0.5);
+        this.goldIcon.setScale(75 / this.goldIcon.width);
+
+        // Update gold icon position when text changes
+        this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
+        
+        if (this.gameStateManager) {
+            this.gameStateManager.on(Events.GOLD_CHANGED, (gold: number) => {
+                this.goldText.setText(`${gold}`);
+                this.goldIcon.setX(this.goldText.x + this.goldText.width + 10);
+            });
+            
+            this.gameStateManager.on(Events.INVENTORY_CHANGED, (inventory: Record<string, number>) => {
+                const count = inventory['turnip'] || 0;
+                this.inventoryText.setText(`x${count}`);
+            });
+        }
+
+        // Initial sync
+        this.goldText.setText(`${this.gameStateManager.gold}`);
+        this.goldIcon.setX(this.goldText.x + this.goldText.width + 10);
 
         // Inventory Slot 
         const slotGraphics = this.add.graphics();
@@ -66,21 +88,7 @@ export class UIScene extends Phaser.Scene {
         .on('pointerover', () => resetBtn.setStyle({ backgroundColor: '#ff6b81' }))
         .on('pointerout', () => resetBtn.setStyle({ backgroundColor: '#ff4757' }));
 
-        // Setup Event Listeners
-        this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
-        
         if (this.gameStateManager) {
-            this.gameStateManager.on(Events.GOLD_CHANGED, (gold: number) => {
-                this.goldText.setText(`Gold: ${gold}`);
-            });
-            
-            this.gameStateManager.on(Events.INVENTORY_CHANGED, (inventory: Record<string, number>) => {
-                const count = inventory['turnip'] || 0;
-                this.inventoryText.setText(`x${count}`);
-            });
-
-            // Initial sync
-            this.goldText.setText(`Gold: ${this.gameStateManager.gold}`);
             const count = this.gameStateManager.getItemCount('turnip');
             this.inventoryText.setText(`x${count}`);
         }
