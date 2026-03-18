@@ -59,26 +59,19 @@ export class MainScene extends Phaser.Scene {
                 const tile = this.add.sprite(sx, sy, 'tile_ground');
                 tile.setOrigin(0.5, 0); 
                 
-                if (tile.width > 0) {
-                    const scale = this.TILE_WIDTH / tile.width;
-                    tile.setScale(scale);
-                    const shape = new Phaser.Geom.Polygon([
-                        tile.width / 2, 0,
-                        tile.width, tile.height / 2,
-                        tile.width / 2, tile.height,
-                        0, tile.height / 2
-                    ]);
-                    tile.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-                }
+                const shape = new Phaser.Geom.Polygon([
+                    this.TILE_WIDTH / 2, 0,
+                    this.TILE_WIDTH, this.TILE_HEIGHT / 2,
+                    this.TILE_WIDTH / 2, this.TILE_HEIGHT,
+                    0, this.TILE_HEIGHT / 2
+                ]);
+                tile.setInteractive(shape, Phaser.Geom.Polygon.Contains);
 
                 tile.on('pointerdown', () => this.handleTileClick(x, y));
                 this.tileSprites[x][y] = tile;
                 
                 const plant = this.add.sprite(sx, sy, 'plant_sprite');
                 plant.setOrigin(0.5, 0); 
-                if (plant.width > 0) {
-                    plant.setScale(this.TILE_WIDTH / plant.width);
-                }
                 plant.setVisible(false);
                 this.plantSprites[x][y] = plant;
                 
