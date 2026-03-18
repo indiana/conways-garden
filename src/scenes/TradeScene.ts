@@ -5,7 +5,6 @@ import { STYLES } from '../constants/Styles';
 
 export class TradeScene extends Phaser.Scene {
     private currentTab: 'BUY' | 'SELL' = 'BUY';
-    private sellQuantity: number = 1;
     private uiContainer!: Phaser.GameObjects.Container;
     private gameStateManager!: GameStateManager;
     
@@ -38,7 +37,7 @@ export class TradeScene extends Phaser.Scene {
         // Gold Display
         this.goldIcon = this.add.sprite(600, 300, 'ui_gold').setOrigin(1, 0.5);
         this.goldIcon.setScale(60 / this.goldIcon.width);
-        this.goldText = this.add.text(this.goldIcon.x - this.goldIcon.displayWidth - 10, 300, '0', {
+        this.goldText = this.add.text(this.goldIcon.x - this.goldIcon.displayWidth - 0, 300, '0', {
             ...STYLES.GOLD,
             strokeThickness: 0 
         }).setOrigin(1, 0.5);
@@ -65,7 +64,6 @@ export class TradeScene extends Phaser.Scene {
         // Listen for wake event to refresh state
         this.events.on('wake', () => {
             this.currentTab = 'BUY';
-            this.sellQuantity = 1;
             this.refresh();
         });
     }
@@ -82,7 +80,6 @@ export class TradeScene extends Phaser.Scene {
         .setInteractive()
         .on('pointerdown', () => {
             this.currentTab = type;
-            this.sellQuantity = 1; // Reset quantity on tab switch
             this.refresh();
         });
     }
@@ -123,11 +120,16 @@ export class TradeScene extends Phaser.Scene {
             }
             this.uiContainer.add(icon);
 
+            // Inventory Count
+            const count = this.gameStateManager.getItemCount(id);
+            const countText = this.add.text(150, currentY, `${count}`, STYLES.UI_LABEL).setOrigin(0.5);
+            this.uiContainer.add(countText);
+
             // Name & Price
             const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0, 0.5);
             const priceLabel = this.add.text(280, currentY + 10, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
             const priceValue = this.add.text(priceLabel.x + priceLabel.width, currentY + 10, `${item.buyPrice}`, STYLES.PRICE).setOrigin(0, 0.5);
-            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 15, currentY + 10, 'ui_gold').setOrigin(0, 0.5);
+            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 0, currentY + 10, 'ui_gold').setOrigin(0, 0.5);
             priceIcon.setScale(50 / priceIcon.width);
             
             this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
@@ -169,86 +171,51 @@ export class TradeScene extends Phaser.Scene {
 
         itemIds.forEach(id => {
             const item = ITEMS[id];
-            const inventoryCount = this.gameStateManager.getItemCount(id);
             const sellPrice = Math.floor(item.buyPrice * 0.5);
 
             // Item Card
-            const card = this.add.rectangle(360, currentY, 500, 200, 0x636e72).setStrokeStyle(2, 0xffffff);
+            const card = this.add.rectangle(360, currentY, 500, 150, 0x636e72).setStrokeStyle(2, 0xffffff);
             this.uiContainer.add(card);
 
             // Icon
-            const icon = this.add.sprite(200, currentY - 20, item.icon);
+            const icon = this.add.sprite(200, currentY, item.icon);
             if (icon.width > 0) {
                 icon.setScale(100 / icon.width);
             }
             this.uiContainer.add(icon);
 
-            // Info
-            const infoText = this.add.text(280, currentY - 50, `${item.displayName} (Posiadasz: ${inventoryCount})`, { 
-                ...STYLES.UI_LABEL,
-                fontSize: '24px'
-            });
-            this.uiContainer.add(infoText);
+            // Inventory Count
+            const count = this.gameStateManager.getItemCount(id);
+            const countText = this.add.text(150, currentY, `${count}`, STYLES.UI_LABEL).setOrigin(0.5);
+            this.uiContainer.add(countText);
 
-            // Quantity Selector (Scoped to this item)
-            this.sellQuantity = Math.min(this.sellQuantity, inventoryCount);
-            this.sellQuantity = Math.max(1, this.sellQuantity);
-
-            const qtyText = this.add.text(360, currentY + 10, `${this.sellQuantity}`, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0.5);
+            // Name & Price
+            const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0, 0.5);
+            const priceLabel = this.add.text(280, currentY + 10, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
+            const priceValue = this.add.text(priceLabel.x + priceLabel.width, currentY + 10, `${sellPrice}`, STYLES.PRICE).setOrigin(0, 0.5);
+            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 0, currentY + 10, 'ui_gold').setOrigin(0, 0.5);
+            priceIcon.setScale(50 / priceIcon.width);
             
-            const minusBtn = this.add.text(300, currentY + 10, '<', { ...STYLES.BUTTON, color: '#f39c12', padding: { x: 0, y: 0 } })
-                .setOrigin(0.5).setInteractive()
-                .on('pointerdown', () => {
-                    if (this.sellQuantity > 1) {
-                        this.sellQuantity--;
-                        this.refresh();
-                    }
-                });
-
-            const plusBtn = this.add.text(420, currentY + 10, '>', { ...STYLES.BUTTON, color: '#f39c12', padding: { x: 0, y: 0 } })
-                .setOrigin(0.5).setInteractive()
-                .on('pointerdown', () => {
-                    if (this.sellQuantity < inventoryCount) {
-                        this.sellQuantity++;
-                        this.refresh();
-                    }
-                });
-            
-            this.uiContainer.add([qtyText, minusBtn, plusBtn]);
-
-            // Total Value
-            const totalValue = this.sellQuantity * sellPrice;
-            const totalLabel = this.add.text(360, currentY + 60, 'Suma: ', STYLES.PRICE).setOrigin(1, 0.5);
-            const totalValueText = this.add.text(totalLabel.x, currentY + 60, `${totalValue}`, STYLES.PRICE).setOrigin(0, 0.5);
-            const totalIcon = this.add.sprite(totalValueText.x + totalValueText.width + 10, currentY + 60, 'ui_gold').setOrigin(0, 0.5);
-            totalIcon.setScale(50 / totalIcon.width);
-            
-            // Adjust label to be centered as a group
-            const totalGroupWidth = totalLabel.width + totalValueText.width + totalIcon.displayWidth + 10;
-            totalLabel.setX(360 - totalGroupWidth/2 + totalLabel.width);
-            totalValueText.setX(totalLabel.x);
-            totalIcon.setX(totalValueText.x + totalValueText.width + 10);
-
-            this.uiContainer.add([totalLabel, totalValueText, totalIcon]);
+            this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
 
             // Sell Button
             const sellBtn = this.add.text(520, currentY, 'SPRZEDAJ', {
                 ...STYLES.UI_LABEL,
+                fontSize: '28px',
                 backgroundColor: '#e74c3c',
                 padding: { x: 10, y: 10 }
             })
             .setOrigin(0.5)
             .setInteractive()
             .on('pointerdown', () => {
-                if (this.gameStateManager.removeItem(id, this.sellQuantity)) {
-                    this.gameStateManager.addGold(totalValue);
-                    this.sellQuantity = 1;
+                if (this.gameStateManager.removeItem(id, 1)) {
+                    this.gameStateManager.addGold(sellPrice);
                     this.refresh();
                 }
             });
             this.uiContainer.add(sellBtn);
             
-            currentY += 220;
+            currentY += 170;
         });
     }
 
