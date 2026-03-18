@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../types';
 import { GameStateManager } from '../managers/GameStateManager';
+import { STYLES } from '../constants/Styles';
 
 export class TradeScene extends Phaser.Scene {
     private currentTab: 'BUY' | 'SELL' = 'BUY';
@@ -15,7 +16,6 @@ export class TradeScene extends Phaser.Scene {
     
     private readonly BG_COLOR = 0x2d3436;
     private readonly ACCENT_COLOR = 0xf39c12;
-    private readonly TEXT_COLOR = '#ffffff';
 
     constructor() {
         super('TradeScene');
@@ -32,27 +32,18 @@ export class TradeScene extends Phaser.Scene {
         this.add.rectangle(360, 640, 600, 800, this.BG_COLOR, 1).setStrokeStyle(4, 0xffffff);
         
         // Title
-        this.add.text(360, 300, 'HANDEL', {
-            fontSize: '48px',
-            fontFamily: 'Arial',
-            color: this.TEXT_COLOR,
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
+        this.add.text(360, 300, 'HANDEL', STYLES.TITLE).setOrigin(0.5);
 
         // Gold Display
         this.goldText = this.add.text(600, 300, 'Gold: 0', {
-            fontSize: '32px',
-            fontFamily: 'Arial',
-            color: '#f1c40f'
+            ...STYLES.GOLD,
+            strokeThickness: 0 // Match original look or keep stroke? Original had no stroke here.
         }).setOrigin(1, 0.5);
 
         // Close Button
         this.add.text(360, 980, 'POWRÓT', {
-            fontSize: '32px',
-            backgroundColor: '#ff4757',
-            color: this.TEXT_COLOR,
-            padding: { x: 30, y: 15 },
-            fontFamily: 'Arial'
+            ...STYLES.BUTTON,
+            backgroundColor: '#ff4757'
         })
         .setOrigin(0.5)
         .setInteractive()
@@ -79,9 +70,8 @@ export class TradeScene extends Phaser.Scene {
     private createTab(x: number, y: number, text: string, type: 'BUY' | 'SELL') {
         const bg = type === this.currentTab ? `#${this.ACCENT_COLOR.toString(16)}` : '#636e72';
         return this.add.text(x, y, text, {
+            ...STYLES.UI_LABEL,
             fontSize: '28px',
-            fontFamily: 'Arial',
-            color: this.TEXT_COLOR,
             backgroundColor: bg,
             padding: { x: 20, y: 10 }
         })
@@ -131,16 +121,16 @@ export class TradeScene extends Phaser.Scene {
             this.uiContainer.add(icon);
 
             // Name & Price
-            const nameText = this.add.text(280, currentY - 30, item.displayName, { fontSize: '32px', color: '#ffffff' });
-            const priceText = this.add.text(280, currentY + 10, `Cena: ${item.buyPrice} Gold`, { fontSize: '24px', color: '#f1c40f' });
+            const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } });
+            const priceText = this.add.text(280, currentY + 10, `Cena: ${item.buyPrice} Gold`, STYLES.PRICE);
             this.uiContainer.add([nameText, priceText]);
 
             // Buy Button
             const canAfford = this.gameStateManager.gold >= item.buyPrice;
             const buyBtn = this.add.text(520, currentY, 'KUP', {
+                ...STYLES.UI_LABEL,
                 fontSize: '28px',
                 backgroundColor: canAfford ? '#2ecc71' : '#7f8c8d',
-                color: '#ffffff',
                 padding: { x: 20, y: 10 }
             })
             .setOrigin(0.5)
@@ -165,7 +155,7 @@ export class TradeScene extends Phaser.Scene {
         let currentY = 550;
 
         if (itemIds.length === 0) {
-            const emptyText = this.add.text(360, currentY, 'Brak przedmiotów na sprzedaż', { fontSize: '24px', color: '#bdc3c7' }).setOrigin(0.5);
+            const emptyText = this.add.text(360, currentY, 'Brak przedmiotów na sprzedaż', STYLES.UI_LABEL).setOrigin(0.5);
             this.uiContainer.add(emptyText);
             return;
         }
@@ -188,19 +178,18 @@ export class TradeScene extends Phaser.Scene {
 
             // Info
             const infoText = this.add.text(280, currentY - 50, `${item.displayName} (Posiadasz: ${inventoryCount})`, { 
-                fontSize: '24px', color: '#ffffff' 
+                ...STYLES.UI_LABEL,
+                fontSize: '24px'
             });
             this.uiContainer.add(infoText);
 
             // Quantity Selector (Scoped to this item)
-            // Note: Since we only support one item selection at a time for simplicity in this proto,
-            // we use the component state 'sellQuantity'. In a real app, this would be per-item.
             this.sellQuantity = Math.min(this.sellQuantity, inventoryCount);
             this.sellQuantity = Math.max(1, this.sellQuantity);
 
-            const qtyText = this.add.text(360, currentY + 10, `${this.sellQuantity}`, { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
+            const qtyText = this.add.text(360, currentY + 10, `${this.sellQuantity}`, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0.5);
             
-            const minusBtn = this.add.text(300, currentY + 10, '<', { fontSize: '32px', color: '#f39c12' })
+            const minusBtn = this.add.text(300, currentY + 10, '<', { ...STYLES.BUTTON, color: '#f39c12', padding: { x: 0, y: 0 } })
                 .setOrigin(0.5).setInteractive()
                 .on('pointerdown', () => {
                     if (this.sellQuantity > 1) {
@@ -209,7 +198,7 @@ export class TradeScene extends Phaser.Scene {
                     }
                 });
 
-            const plusBtn = this.add.text(420, currentY + 10, '>', { fontSize: '32px', color: '#f39c12' })
+            const plusBtn = this.add.text(420, currentY + 10, '>', { ...STYLES.BUTTON, color: '#f39c12', padding: { x: 0, y: 0 } })
                 .setOrigin(0.5).setInteractive()
                 .on('pointerdown', () => {
                     if (this.sellQuantity < inventoryCount) {
@@ -222,14 +211,13 @@ export class TradeScene extends Phaser.Scene {
 
             // Total Value
             const totalValue = this.sellQuantity * sellPrice;
-            const totalText = this.add.text(360, currentY + 60, `Suma: ${totalValue} Gold`, { fontSize: '24px', color: '#f1c40f' }).setOrigin(0.5);
+            const totalText = this.add.text(360, currentY + 60, `Suma: ${totalValue} Gold`, STYLES.PRICE).setOrigin(0.5);
             this.uiContainer.add(totalText);
 
             // Sell Button
             const sellBtn = this.add.text(520, currentY, 'SPRZEDAJ', {
-                fontSize: '24px',
+                ...STYLES.UI_LABEL,
                 backgroundColor: '#e74c3c',
-                color: '#ffffff',
                 padding: { x: 10, y: 10 }
             })
             .setOrigin(0.5)

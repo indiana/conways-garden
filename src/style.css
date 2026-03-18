@@ -8,8 +8,15 @@ body {
   align-items: center;
   height: 100vh;
   width: 100vw;
+  font-family: 'Fredoka', sans-serif;
 }
 
+/* Preload font */
+.font-loader {
+    font-family: 'Fredoka';
+    position: absolute;
+    left: -9999px;
+}
 #game-container {
   width: 100%;
   height: 100%;

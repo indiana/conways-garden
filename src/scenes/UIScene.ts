@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GameStateManager } from '../managers/GameStateManager';
 import { Events } from '../constants/Events';
 import { MainScene } from './MainScene';
+import { STYLES } from '../constants/Styles';
 
 export class UIScene extends Phaser.Scene {
     private inventoryText!: Phaser.GameObjects.Text;
@@ -20,13 +21,7 @@ export class UIScene extends Phaser.Scene {
 
     create() {
         // Gold Display
-        this.goldText = this.add.text(40, 40, 'Gold: 20', {
-            fontSize: '32px',
-            fontFamily: 'Arial',
-            color: '#f1c40f', // Gold color
-            stroke: '#000000',
-            strokeThickness: 4
-        });
+        this.goldText = this.add.text(40, 40, 'Gold: 20', STYLES.GOLD);
 
         // Inventory Slot 
         const slotGraphics = this.add.graphics();
@@ -42,13 +37,7 @@ export class UIScene extends Phaser.Scene {
             turnipIcon.setScale(scale);
         }
 
-        this.inventoryText = this.add.text(this.UI_CENTER_X + 20, this.INVENTORY_Y, 'x5', {
-            fontSize: '48px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 6
-        }).setOrigin(0.5);
+        this.inventoryText = this.add.text(this.UI_CENTER_X + 20, this.INVENTORY_Y, 'x5', STYLES.INVENTORY).setOrigin(0.5);
 
         // Radial Timer
         this.timerGraphics = this.add.graphics();
@@ -56,11 +45,8 @@ export class UIScene extends Phaser.Scene {
         
         // Trade Button
         const tradeBtn = this.add.text(this.UI_CENTER_X, this.INVENTORY_Y + 80, 'HANDEL', {
-            fontSize: '32px',
-            backgroundColor: '#f39c12',
-            color: '#ffffff',
-            padding: { x: 20, y: 10 },
-            fontFamily: 'Arial'
+            ...STYLES.BUTTON,
+            backgroundColor: '#f39c12'
         })
         .setOrigin(0.5)
         .setInteractive()
@@ -70,11 +56,9 @@ export class UIScene extends Phaser.Scene {
 
         // Reset Button
         const resetBtn = this.add.text(this.UI_CENTER_X, this.INVENTORY_Y + 160, 'RESET', {
+            ...STYLES.BUTTON,
             fontSize: '24px',
-            backgroundColor: '#ff4757',
-            color: '#ffffff',
-            padding: { x: 15, y: 8 },
-            fontFamily: 'Arial'
+            backgroundColor: '#ff4757'
         })
         .setOrigin(0.5)
         .setInteractive()
@@ -101,7 +85,7 @@ export class UIScene extends Phaser.Scene {
             this.inventoryText.setText(`x${count}`);
         }
 
-        const mainScene = this.scene.get('MainScene');
+        const mainScene = this.scene.get('MainScene') as MainScene;
         if (mainScene) {
             mainScene.events.on(Events.PULSE_PROGRESS, (progress: number) => {
                 this.drawTimer(progress);
