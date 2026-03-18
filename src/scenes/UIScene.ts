@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 export class UIScene extends Phaser.Scene {
     private inventoryText!: Phaser.GameObjects.Text;
+    private goldText!: Phaser.GameObjects.Text;
     private timerGraphics!: Phaser.GameObjects.Graphics;
     
     private readonly UI_CENTER_X = 360;
@@ -13,6 +14,15 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
+        // Gold Display
+        this.goldText = this.add.text(40, 40, 'Gold: 20', {
+            fontSize: '32px',
+            fontFamily: 'Arial',
+            color: '#f1c40f', // Gold color
+            stroke: '#000000',
+            strokeThickness: 4
+        });
+
         // Inventory Slot 
         const slotGraphics = this.add.graphics();
         slotGraphics.fillStyle(0x000000, 0.5);
@@ -39,12 +49,26 @@ export class UIScene extends Phaser.Scene {
         this.timerGraphics = this.add.graphics();
         this.drawTimer(0); 
         
-        // Reset Button
-        const resetBtn = this.add.text(this.UI_CENTER_X, this.INVENTORY_Y + 120, 'RESET', {
+        // Trade Button
+        const tradeBtn = this.add.text(this.UI_CENTER_X, this.INVENTORY_Y + 80, 'HANDEL', {
             fontSize: '32px',
-            backgroundColor: '#ff4757',
+            backgroundColor: '#f39c12',
             color: '#ffffff',
             padding: { x: 20, y: 10 },
+            fontFamily: 'Arial'
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => this.handleTrade())
+        .on('pointerover', () => tradeBtn.setStyle({ backgroundColor: '#f1c40f' }))
+        .on('pointerout', () => tradeBtn.setStyle({ backgroundColor: '#f39c12' }));
+
+        // Reset Button
+        const resetBtn = this.add.text(this.UI_CENTER_X, this.INVENTORY_Y + 160, 'RESET', {
+            fontSize: '24px',
+            backgroundColor: '#ff4757',
+            color: '#ffffff',
+            padding: { x: 15, y: 8 },
             fontFamily: 'Arial'
         })
         .setOrigin(0.5)
@@ -74,8 +98,18 @@ export class UIScene extends Phaser.Scene {
         }
     }
 
-    public updateInventory(count: number) {
-        this.inventoryText.setText(`x${count}`);
+    private handleTrade() {
+        this.scene.pause('MainScene');
+        this.scene.run('TradeScene');
+    }
+
+    public updateInventory(count: number, gold: number) {
+        if (this.inventoryText) {
+            this.inventoryText.setText(`x${count}`);
+        }
+        if (this.goldText) {
+            this.goldText.setText(`Gold: ${gold}`);
+        }
     }
 
     public updateTimer(progress: number) {

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { type GameState, INITIAL_STATE } from '../types';
 
 export class MainScene extends Phaser.Scene {
     private grid: boolean[][] = [];
@@ -6,7 +7,7 @@ export class MainScene extends Phaser.Scene {
     private plantSprites: Phaser.GameObjects.Sprite[][] = [];
     private gridGroup!: Phaser.GameObjects.Group;
 
-    private inventory: number = 5;
+    public gameState: GameState;
     private pulseTimer!: Phaser.Time.TimerEvent;
 
     private readonly GRID_SIZE = 4;
@@ -18,6 +19,8 @@ export class MainScene extends Phaser.Scene {
 
     constructor() {
         super('MainScene');
+        // Deep copy initial state
+        this.gameState = JSON.parse(JSON.stringify(INITIAL_STATE));
     }
 
     create() {
@@ -33,6 +36,7 @@ export class MainScene extends Phaser.Scene {
         });
 
         this.updateVisuals();
+        this.syncUI();
     }
 
     update() {
@@ -100,12 +104,14 @@ export class MainScene extends Phaser.Scene {
     }
 
     private handleTileClick(x: number, y: number) {
-        if (!this.grid[x][y] && this.inventory > 0) {
+        const turnipCount = this.gameState.inventory['turnip'] || 0;
+        
+        if (!this.grid[x][y] && turnipCount > 0) {
             this.grid[x][y] = true;
-            this.inventory--;
+            this.gameState.inventory['turnip']--;
         } else if (this.grid[x][y]) {
             this.grid[x][y] = false;
-            this.inventory++;
+            this.gameState.inventory['turnip'] = turnipCount + 1;
         }
         this.updateVisuals();
         this.syncUI();
@@ -156,7 +162,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     public resetGame() {
-        this.inventory = 5;
+        this.gameState = JSON.parse(JSON.stringify(INITIAL_STATE));
         for (let x = 0; x < this.GRID_SIZE; x++) {
             for (let y = 0; y < this.GRID_SIZE; y++) {
                 this.grid[x][y] = false;
@@ -172,10 +178,10 @@ export class MainScene extends Phaser.Scene {
         this.syncUI();
     }
 
-    private syncUI() {
+    public syncUI() {
         const uiScene = this.scene.get('UIScene') as any;
         if (uiScene && uiScene.updateInventory) {
-            uiScene.updateInventory(this.inventory);
+            uiScene.updateInventory(this.gameState.inventory['turnip'], this.gameState.gold);
         }
     }
 }

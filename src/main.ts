@@ -3,6 +3,7 @@ import './style.css';
 import { PreloadScene } from './scenes/PreloadScene';
 import { MainScene } from './scenes/MainScene';
 import { UIScene } from './scenes/UIScene';
+import { TradeScene } from './scenes/TradeScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -21,7 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
             debug: false
         }
     },
-    scene: [PreloadScene, MainScene, UIScene],
+    scene: [PreloadScene, MainScene, UIScene, TradeScene],
     fps: {
         target: 60,
         forceSetTimeOut: true
