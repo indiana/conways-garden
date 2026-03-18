@@ -1,9 +1,14 @@
 import Phaser from 'phaser';
+import { GameStateManager } from '../managers/GameStateManager';
+import { Events } from '../constants/Events';
+import { MainScene } from './MainScene';
 
 export class UIScene extends Phaser.Scene {
     private inventoryText!: Phaser.GameObjects.Text;
     private goldText!: Phaser.GameObjects.Text;
     private timerGraphics!: Phaser.GameObjects.Graphics;
+    
+    private gameStateManager!: GameStateManager;
     
     private readonly UI_CENTER_X = 360;
     private readonly TIMER_Y = 150;
@@ -76,6 +81,32 @@ export class UIScene extends Phaser.Scene {
         .on('pointerdown', () => this.handleReset())
         .on('pointerover', () => resetBtn.setStyle({ backgroundColor: '#ff6b81' }))
         .on('pointerout', () => resetBtn.setStyle({ backgroundColor: '#ff4757' }));
+
+        // Setup Event Listeners
+        this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
+        
+        if (this.gameStateManager) {
+            this.gameStateManager.on(Events.GOLD_CHANGED, (gold: number) => {
+                this.goldText.setText(`Gold: ${gold}`);
+            });
+            
+            this.gameStateManager.on(Events.INVENTORY_CHANGED, (inventory: Record<string, number>) => {
+                const count = inventory['turnip'] || 0;
+                this.inventoryText.setText(`x${count}`);
+            });
+
+            // Initial sync
+            this.goldText.setText(`Gold: ${this.gameStateManager.gold}`);
+            const count = this.gameStateManager.getItemCount('turnip');
+            this.inventoryText.setText(`x${count}`);
+        }
+
+        const mainScene = this.scene.get('MainScene');
+        if (mainScene) {
+            mainScene.events.on(Events.PULSE_PROGRESS, (progress: number) => {
+                this.drawTimer(progress);
+            });
+        }
     }
 
     private drawTimer(progress: number) {
@@ -92,7 +123,7 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleReset() {
-        const mainScene = this.scene.get('MainScene') as any;
+        const mainScene = this.scene.get('MainScene') as MainScene;
         if (mainScene && mainScene.resetGame) {
             mainScene.resetGame();
         }
@@ -101,18 +132,5 @@ export class UIScene extends Phaser.Scene {
     private handleTrade() {
         this.scene.pause('MainScene');
         this.scene.run('TradeScene');
-    }
-
-    public updateInventory(count: number, gold: number) {
-        if (this.inventoryText) {
-            this.inventoryText.setText(`x${count}`);
-        }
-        if (this.goldText) {
-            this.goldText.setText(`Gold: ${gold}`);
-        }
-    }
-
-    public updateTimer(progress: number) {
-        this.drawTimer(progress);
     }
 }

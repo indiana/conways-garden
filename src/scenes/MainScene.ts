@@ -1,13 +1,15 @@
 import Phaser from 'phaser';
-import { type GameState, INITIAL_STATE } from '../types';
+import { GameStateManager } from '../managers/GameStateManager';
+import { GridSystem } from '../systems/GridSystem';
+import { Events } from '../constants/Events';
 
 export class MainScene extends Phaser.Scene {
-    private grid: boolean[][] = [];
+    private gridSystem!: GridSystem;
     private tileSprites: Phaser.GameObjects.Sprite[][] = [];
     private plantSprites: Phaser.GameObjects.Sprite[][] = [];
     private gridGroup!: Phaser.GameObjects.Group;
 
-    public gameState: GameState;
+    private gameStateManager!: GameStateManager;
     private pulseTimer!: Phaser.Time.TimerEvent;
 
     private readonly GRID_SIZE = 4;
@@ -19,47 +21,38 @@ export class MainScene extends Phaser.Scene {
 
     constructor() {
         super('MainScene');
-        // Deep copy initial state
-        this.gameState = JSON.parse(JSON.stringify(INITIAL_STATE));
     }
 
     create() {
+        // Initialize Managers
+        this.gameStateManager = new GameStateManager();
+        this.registry.set('gameStateManager', this.gameStateManager);
+
+        this.gridSystem = new GridSystem(this.GRID_SIZE);
+        this.gridSystem.on(Events.GRID_UPDATED, () => this.updateVisuals());
+
         this.gridGroup = this.add.group();
-        this.initGrid();
         this.drawGrid();
 
         this.pulseTimer = this.time.addEvent({
             delay: this.PULSE_INTERVAL,
-            callback: this.executePulse,
+            callback: () => this.gridSystem.executePulse(),
             callbackScope: this,
             loop: true
         });
 
         this.updateVisuals();
-        this.syncUI();
     }
 
     update() {
         const progress = this.pulseTimer.getOverallProgress();
-        const uiScene = this.scene.get('UIScene') as any;
-        if (uiScene && uiScene.updateTimer) {
-            uiScene.updateTimer(progress);
-        }
-    }
-
-    private initGrid() {
-        for (let x = 0; x < this.GRID_SIZE; x++) {
-            this.grid[x] = [];
-            this.tileSprites[x] = [];
-            this.plantSprites[x] = [];
-            for (let y = 0; y < this.GRID_SIZE; y++) {
-                this.grid[x][y] = false;
-            }
-        }
+        this.events.emit(Events.PULSE_PROGRESS, progress);
     }
 
     private drawGrid() {
         for (let x = 0; x < this.GRID_SIZE; x++) {
+            this.tileSprites[x] = [];
+            this.plantSprites[x] = [];
             for (let y = 0; y < this.GRID_SIZE; y++) {
                 const { sx, sy } = this.cartesianToIsometric(x, y);
                 
@@ -104,84 +97,36 @@ export class MainScene extends Phaser.Scene {
     }
 
     private handleTileClick(x: number, y: number) {
-        const turnipCount = this.gameState.inventory['turnip'] || 0;
+        const turnipCount = this.gameStateManager.getItemCount('turnip');
+        const isAlive = this.gridSystem.isAlive(x, y);
         
-        if (!this.grid[x][y] && turnipCount > 0) {
-            this.grid[x][y] = true;
-            this.gameState.inventory['turnip']--;
-        } else if (this.grid[x][y]) {
-            this.grid[x][y] = false;
-            this.gameState.inventory['turnip'] = turnipCount + 1;
+        if (!isAlive && turnipCount > 0) {
+            this.gridSystem.setCell(x, y, true);
+            this.gameStateManager.removeItem('turnip', 1);
+        } else if (isAlive) {
+            this.gridSystem.setCell(x, y, false);
+            this.gameStateManager.addItem('turnip', 1);
         }
-        this.updateVisuals();
-        this.syncUI();
-    }
-
-    private executePulse() {
-        const nextGrid: boolean[][] = [];
-
-        for (let x = 0; x < this.GRID_SIZE; x++) {
-            nextGrid[x] = [];
-            for (let y = 0; y < this.GRID_SIZE; y++) {
-                const neighbors = this.countNeighbors(x, y);
-                const isAlive = this.grid[x][y];
-
-                if (isAlive) {
-                    nextGrid[x][y] = (neighbors === 2 || neighbors === 3);
-                } else {
-                    nextGrid[x][y] = (neighbors === 3);
-                }
-            }
-        }
-
-        this.grid = nextGrid;
-        this.updateVisuals();
-    }
-
-    private countNeighbors(cx: number, cy: number): number {
-        let count = 0;
-        for (let x = -1; x <= 1; x++) {
-            for (let y = -1; y <= 1; y++) {
-                if (x === 0 && y === 0) continue;
-                const nx = cx + x;
-                const ny = cy + y;
-                if (nx >= 0 && nx < this.GRID_SIZE && ny >= 0 && ny < this.GRID_SIZE) {
-                    if (this.grid[nx][ny]) count++;
-                }
-            }
-        }
-        return count;
     }
 
     private updateVisuals() {
         for (let x = 0; x < this.GRID_SIZE; x++) {
             for (let y = 0; y < this.GRID_SIZE; y++) {
-                this.plantSprites[x][y].setVisible(this.grid[x][y]);
+                if (this.plantSprites[x] && this.plantSprites[x][y]) {
+                    this.plantSprites[x][y].setVisible(this.gridSystem.isAlive(x, y));
+                }
             }
         }
     }
 
     public resetGame() {
-        this.gameState = JSON.parse(JSON.stringify(INITIAL_STATE));
-        for (let x = 0; x < this.GRID_SIZE; x++) {
-            for (let y = 0; y < this.GRID_SIZE; y++) {
-                this.grid[x][y] = false;
-            }
-        }
+        this.gameStateManager.reset();
+        this.gridSystem.reset();
         this.pulseTimer.reset({
             delay: this.PULSE_INTERVAL,
-            callback: this.executePulse,
+            callback: () => this.gridSystem.executePulse(),
             callbackScope: this,
             loop: true
         });
-        this.updateVisuals();
-        this.syncUI();
-    }
-
-    public syncUI() {
-        const uiScene = this.scene.get('UIScene') as any;
-        if (uiScene && uiScene.updateInventory) {
-            uiScene.updateInventory(this.gameState.inventory['turnip'], this.gameState.gold);
-        }
     }
 }
