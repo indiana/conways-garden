@@ -4,6 +4,8 @@ import { PreloadScene } from './scenes/PreloadScene';
 import { MainScene } from './scenes/MainScene';
 import { UIScene } from './scenes/UIScene';
 import { TradeScene } from './scenes/TradeScene';
+import { AchievementsScene } from './scenes/AchievementsScene';
+import { AtlasScene } from './scenes/AtlasScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -22,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
             debug: false
         }
     },
-    scene: [PreloadScene, MainScene, UIScene, TradeScene],
+    scene: [PreloadScene, MainScene, UIScene, TradeScene, AchievementsScene, AtlasScene],
     fps: {
         target: 60,
         forceSetTimeOut: true

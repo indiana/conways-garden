@@ -9,12 +9,9 @@ export class TradeScene extends Phaser.Scene {
     private gameStateManager!: GameStateManager;
     
     // UI Elements
-    private goldText!: Phaser.GameObjects.Text;
-    private goldIcon!: Phaser.GameObjects.Sprite;
     private tabBuyBtn!: Phaser.GameObjects.Text;
     private tabSellBtn!: Phaser.GameObjects.Text;
     
-    private readonly BG_COLOR = 0x2d3436;
     private readonly ACCENT_COLOR = 0xf39c12;
 
     constructor() {
@@ -24,36 +21,16 @@ export class TradeScene extends Phaser.Scene {
     create() {
         this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
 
-        // Semi-transparent background overlay
-        this.add.rectangle(360, 640, 720, 1280, 0x000000, 0.7)
-            .setInteractive(); // Block input to scenes below
+        // Fullscreen background overlay (Matching Garden background color)
+        this.add.rectangle(360, 640, 720, 1280, 0x2d3436, 1)
+            .setInteractive(); // Block input
 
-        // Main Panel
-        this.add.rectangle(360, 640, 600, 800, this.BG_COLOR, 1).setStrokeStyle(4, 0xffffff);
-        
         // Title
-        this.add.text(360, 300, 'HANDEL', STYLES.TITLE).setOrigin(0.5);
-
-        // Gold Display
-        this.goldIcon = this.add.sprite(600, 300, 'ui_gold').setOrigin(1, 0.5);
-        this.goldIcon.setScale(60 / this.goldIcon.width);
-        this.goldText = this.add.text(this.goldIcon.x - this.goldIcon.displayWidth - 0, 300, '0', {
-            ...STYLES.GOLD,
-            strokeThickness: 0 
-        }).setOrigin(1, 0.5);
-
-        // Close Button
-        this.add.text(360, 980, 'POWRÓT', {
-            ...STYLES.BUTTON,
-            backgroundColor: '#ff4757'
-        })
-        .setOrigin(0.5)
-        .setInteractive()
-        .on('pointerdown', () => this.handleClose());
+        this.add.text(360, 150, 'HANDEL', STYLES.TITLE).setOrigin(0.5);
 
         // Tabs
-        this.tabBuyBtn = this.createTab(260, 400, 'KUP', 'BUY');
-        this.tabSellBtn = this.createTab(460, 400, 'SPRZEDAŻ', 'SELL');
+        this.tabBuyBtn = this.createTab(260, 250, 'KUP', 'BUY');
+        this.tabSellBtn = this.createTab(460, 250, 'SPRZEDAŻ', 'SELL');
 
         // Content Container
         this.uiContainer = this.add.container(0, 0);
@@ -85,8 +62,6 @@ export class TradeScene extends Phaser.Scene {
     }
 
     private refresh() {
-        this.goldText.setText(`${this.gameStateManager.gold}`);
-        
         // Update Tab Styles
         const activeBg = `#${this.ACCENT_COLOR.toString(16)}`;
         this.tabBuyBtn.setStyle({ backgroundColor: this.currentTab === 'BUY' ? activeBg : '#636e72' });
@@ -104,15 +79,11 @@ export class TradeScene extends Phaser.Scene {
 
     private renderBuyView() {
         const itemIds = Object.keys(ITEMS);
-        let currentY = 550;
+        let currentY = 400;
 
         itemIds.forEach(id => {
             const item = ITEMS[id];
             
-            // Item Card
-            const card = this.add.rectangle(360, currentY, 500, 150, 0x636e72).setStrokeStyle(2, 0xffffff);
-            this.uiContainer.add(card);
-
             // Icon
             const icon = this.add.sprite(200, currentY, item.icon);
             this.uiContainer.add(icon);
@@ -152,13 +123,13 @@ export class TradeScene extends Phaser.Scene {
             }
             this.uiContainer.add(buyBtn);
             
-            currentY += 170; // Offset for next item
+            currentY += 170;
         });
     }
 
     private renderSellView() {
         const itemIds = Object.keys(ITEMS).filter(id => this.gameStateManager.getItemCount(id) > 0);
-        let currentY = 550;
+        let currentY = 400;
 
         if (itemIds.length === 0) {
             const emptyText = this.add.text(360, currentY, 'Brak przedmiotów na sprzedaż', STYLES.UI_LABEL).setOrigin(0.5);
@@ -169,10 +140,6 @@ export class TradeScene extends Phaser.Scene {
         itemIds.forEach(id => {
             const item = ITEMS[id];
             const sellPrice = Math.floor(item.buyPrice * 0.5);
-
-            // Item Card
-            const card = this.add.rectangle(360, currentY, 500, 150, 0x636e72).setStrokeStyle(2, 0xffffff);
-            this.uiContainer.add(card);
 
             // Icon
             const icon = this.add.sprite(200, currentY, item.icon);
@@ -211,10 +178,5 @@ export class TradeScene extends Phaser.Scene {
             
             currentY += 170;
         });
-    }
-
-    private handleClose() {
-        this.scene.sleep();
-        this.scene.resume('MainScene');
     }
 }

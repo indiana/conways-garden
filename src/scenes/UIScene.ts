@@ -4,26 +4,32 @@ import { Events } from "../constants/Events";
 import { MainScene } from "./MainScene";
 import { STYLES } from "../constants/Styles";
 
+type NavTab = 'GARDEN' | 'TRADE' | 'ACHIEVEMENTS' | 'ATLAS';
+
 export class UIScene extends Phaser.Scene {
   private goldText!: Phaser.GameObjects.Text;
   private goldIcon!: Phaser.GameObjects.Sprite;
   private timerGraphics!: Phaser.GameObjects.Graphics;
 
   // Inventory UI
+  private inventoryGroup!: Phaser.GameObjects.Group;
   private selectionFrames: Record<string, Phaser.GameObjects.Graphics> = {};
   private countTexts: Record<string, Phaser.GameObjects.Text> = {};
   
+  // Navigation UI
+  private activeTab: NavTab = 'GARDEN';
+  private navButtons: Record<NavTab, Phaser.GameObjects.Sprite> = {} as any;
+
   private gameStateManager!: GameStateManager;
 
   private readonly UI_CENTER_X = 360;
   private readonly TIMER_Y = 150;
-  private readonly INVENTORY_Y = 1100; // Still used for Buttons
   
-  // New Inventory Layout
+  // Inventory Layout
   private readonly LIST_X = 168; // Aligned with grid left
   private readonly LIST_START_Y = 900;
   private readonly ITEM_SPACING = 140;
-  private readonly SLOT_WIDTH = 280; // Widen to include text
+  private readonly SLOT_WIDTH = 280; 
   private readonly SLOT_HEIGHT = 120;
 
   constructor() {
@@ -57,7 +63,8 @@ export class UIScene extends Phaser.Scene {
       );
     }
 
-    // Initialize Inventory List
+    // Initialize Inventory Group
+    this.inventoryGroup = this.add.group();
     this.createInventoryList();
 
     // Initial Inventory Sync
@@ -67,39 +74,9 @@ export class UIScene extends Phaser.Scene {
     // Radial Timer
     this.timerGraphics = this.add.graphics();
     this.drawTimer(0);
-
-    // Trade Button
-    const tradeBtn = this.add
-      .text(this.UI_CENTER_X, this.INVENTORY_Y + 120, "HANDEL", {
-        ...STYLES.BUTTON,
-        backgroundColor: "#f39c12",
-      })
-      .setOrigin(0.5)
-      .setInteractive()
-      .on("pointerdown", () => this.handleTrade())
-      .on("pointerover", () =>
-        tradeBtn.setStyle({ backgroundColor: "#f1c40f" }),
-      )
-      .on("pointerout", () =>
-        tradeBtn.setStyle({ backgroundColor: "#f39c12" }),
-      );
-
-    // Reset Button
-    const resetBtn = this.add
-      .text(this.UI_CENTER_X, this.INVENTORY_Y + 200, "RESET", {
-        ...STYLES.BUTTON,
-        fontSize: "24px",
-        backgroundColor: "#ff4757",
-      })
-      .setOrigin(0.5)
-      .setInteractive()
-      .on("pointerdown", () => this.handleReset())
-      .on("pointerover", () =>
-        resetBtn.setStyle({ backgroundColor: "#ff6b81" }),
-      )
-      .on("pointerout", () =>
-        resetBtn.setStyle({ backgroundColor: "#ff4757" }),
-      );
+    
+    // Create Navigation Bar
+    this.createNavBar();
 
     const mainScene = this.scene.get("MainScene") as MainScene;
     if (mainScene) {
@@ -107,6 +84,98 @@ export class UIScene extends Phaser.Scene {
         this.drawTimer(progress);
       });
     }
+
+    // Initial Visibility
+    this.updateGardenElementsVisibility();
+  }
+
+  private createNavBar() {
+      const y = 1280 - 100; // Position from bottom
+      const spacing = 170;  // Horizontal spacing
+      const startX = 360 - (spacing * 1.5); 
+
+      this.navButtons.GARDEN = this.createNavButton(startX, y, 'btn_garden', 'GARDEN');
+      this.navButtons.TRADE = this.createNavButton(startX + spacing, y, 'btn_trade', 'TRADE');
+      this.navButtons.ACHIEVEMENTS = this.createNavButton(startX + spacing * 2, y, 'btn_achievements', 'ACHIEVEMENTS');
+      this.navButtons.ATLAS = this.createNavButton(startX + spacing * 3, y, 'btn_atlas', 'ATLAS');
+
+      this.updateNavVisuals();
+  }
+
+  private createNavButton(x: number, y: number, key: string, tab: NavTab) {
+      const btn = this.add.sprite(x, y, key).setInteractive();
+      btn.setScale(160 / btn.width); // Normalize width to ~160px
+      btn.on('pointerdown', () => this.switchTab(tab));
+      return btn;
+  }
+
+  private switchTab(tab: NavTab) {
+      if (this.activeTab === tab) return;
+
+      this.activeTab = tab;
+      this.updateNavVisuals();
+      this.updateGardenElementsVisibility();
+
+      const tabs: Record<NavTab, string> = {
+          'GARDEN': 'MainScene',
+          'TRADE': 'TradeScene',
+          'ACHIEVEMENTS': 'AchievementsScene',
+          'ATLAS': 'AtlasScene'
+      };
+
+      // Deactivate all others
+      Object.entries(tabs).forEach(([key, sceneKey]) => {
+          if (key === tab) {
+              // Activate
+              if (tab === 'GARDEN') {
+                  this.scene.resume(sceneKey);
+              } else {
+                  this.scene.pause('MainScene');
+                  this.scene.setVisible(false, 'MainScene');
+                  
+                  if (this.scene.get(sceneKey).scene.isSleeping()) {
+                      this.scene.wake(sceneKey);
+                  } else if (!this.scene.isActive(sceneKey)) {
+                      this.scene.launch(sceneKey);
+                  }
+              }
+              this.scene.setVisible(true, sceneKey);
+              this.scene.bringToTop(sceneKey);
+          } else {
+              // Deactivate
+              if (key === 'GARDEN') {
+                  this.scene.pause(sceneKey);
+                  this.scene.setVisible(false, sceneKey);
+              } else {
+                  this.scene.sleep(sceneKey);
+                  this.scene.setVisible(false, sceneKey);
+              }
+          }
+      });
+
+      this.scene.bringToTop('UIScene');
+  }
+
+  private updateGardenElementsVisibility() {
+      const isGarden = this.activeTab === 'GARDEN';
+      this.timerGraphics.setVisible(isGarden);
+      this.inventoryGroup.setVisible(isGarden);
+  }
+
+  private updateNavVisuals() {
+      // Reset all to default
+      this.navButtons.GARDEN.setTexture('btn_garden');
+      this.navButtons.TRADE.setTexture('btn_trade');
+      this.navButtons.ACHIEVEMENTS.setTexture('btn_achievements');
+      this.navButtons.ATLAS.setTexture('btn_atlas');
+
+      // Set active
+      switch (this.activeTab) {
+          case 'GARDEN': this.navButtons.GARDEN.setTexture('btn_garden_active'); break;
+          case 'TRADE': this.navButtons.TRADE.setTexture('btn_trade_active'); break;
+          case 'ACHIEVEMENTS': this.navButtons.ACHIEVEMENTS.setTexture('btn_achievements_active'); break;
+          case 'ATLAS': this.navButtons.ATLAS.setTexture('btn_atlas_active'); break;
+      }
   }
 
   private createInventoryList() {
@@ -127,20 +196,24 @@ export class UIScene extends Phaser.Scene {
       // Selection Frame (Graphics)
       const frame = this.add.graphics();
       this.selectionFrames[itemId] = frame;
+      this.inventoryGroup.add(frame);
 
-      // Interactive Zone - shifted right to cover entry
+      // Interactive Zone
       const zone = this.add.zone(x + this.SLOT_WIDTH / 2 - 20, y, this.SLOT_WIDTH, this.SLOT_HEIGHT).setOrigin(0.5).setInteractive();
       zone.on('pointerdown', () => {
           this.gameStateManager.selectedItem = itemId;
           this.updateSelectionHighlight();
       });
+      this.inventoryGroup.add(zone);
 
-      // Icon (Left aligned)
-      this.add.sprite(x, y, iconKey).setScale(1.2).setOrigin(0, 0.5);
+      // Icon
+      const icon = this.add.sprite(x, y, iconKey).setScale(1.2).setOrigin(0, 0.5);
+      this.inventoryGroup.add(icon);
 
-      // Count Text (On the right of the icon)
+      // Count Text
       const text = this.add.text(x + 110, y, 'x0', STYLES.INVENTORY).setOrigin(0, 0.5);
       this.countTexts[itemId] = text;
+      this.inventoryGroup.add(text);
   }
 
   private updateSelectionHighlight() {
@@ -149,13 +222,12 @@ export class UIScene extends Phaser.Scene {
       Object.keys(this.selectionFrames).forEach(itemId => {
           const frame = this.selectionFrames[itemId];
           const index = itemId === 'turnip' ? 0 : 1; 
-          const x = this.LIST_X - 10; // Padding
+          const x = this.LIST_X - 10;
           const y = this.LIST_START_Y + (index * this.ITEM_SPACING);
 
           frame.clear();
           
           if (itemId === selectedItem) {
-              // Gray Frame
               frame.lineStyle(4, 0x7f8c8d, 1);
               frame.strokeRoundedRect(x, y - this.SLOT_HEIGHT / 2, this.SLOT_WIDTH, this.SLOT_HEIGHT, 15);
           }
@@ -194,17 +266,5 @@ export class UIScene extends Phaser.Scene {
       );
       this.timerGraphics.strokePath();
     }
-  }
-
-  private handleReset() {
-    const mainScene = this.scene.get("MainScene") as MainScene;
-    if (mainScene && mainScene.resetGame) {
-      mainScene.resetGame();
-    }
-  }
-
-  private handleTrade() {
-    this.scene.pause("MainScene");
-    this.scene.run("TradeScene");
   }
 }
