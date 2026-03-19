@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import { Events } from '../constants/Events';
+import { PlantFactory } from './plants/PlantFactory';
+import { HybridSystem } from './HybridSystem';
 
 export class GridSystem extends Phaser.Events.EventEmitter {
-    private grid: boolean[][] = [];
+    private grid: (string | null)[][] = [];
     private readonly size: number;
 
     constructor(size: number) {
@@ -15,47 +17,62 @@ export class GridSystem extends Phaser.Events.EventEmitter {
         for (let x = 0; x < this.size; x++) {
             this.grid[x] = [];
             for (let y = 0; y < this.size; y++) {
-                this.grid[x][y] = false;
+                this.grid[x][y] = null;
             }
         }
     }
 
     public isAlive(x: number, y: number): boolean {
+        return this.grid[x][y] !== null;
+    }
+
+    public getCell(x: number, y: number): string | null {
         return this.grid[x][y];
     }
 
-    public toggleCell(x: number, y: number): boolean {
-        this.grid[x][y] = !this.grid[x][y];
-        this.emit(Events.GRID_UPDATED, this.grid);
-        return this.grid[x][y];
-    }
-
-    public setCell(x: number, y: number, alive: boolean) {
-        if (this.grid[x][y] !== alive) {
-            this.grid[x][y] = alive;
+    public setCell(x: number, y: number, value: string | null) {
+        if (this.grid[x][y] !== value) {
+            this.grid[x][y] = value;
             this.emit(Events.GRID_UPDATED, this.grid);
         }
     }
 
     public executePulse() {
-        const nextGrid: boolean[][] = [];
+        const nextGrid: (string | null)[][] = [];
         let changed = false;
 
         for (let x = 0; x < this.size; x++) {
             nextGrid[x] = [];
             for (let y = 0; y < this.size; y++) {
-                const neighbors = this.countNeighbors(x, y);
-                const isAlive = this.grid[x][y];
-                let nextState = false;
+                const neighbors = this.getNeighbors(x, y);
+                const currentPlantId = this.grid[x][y];
+                let nextState: string | null = null;
 
-                if (isAlive) {
-                    nextState = (neighbors === 2 || neighbors === 3);
+                if (currentPlantId) {
+                    // Survival Logic
+                    const plantType = PlantFactory.getPlant(currentPlantId);
+                    if (plantType) {
+                        const shouldSurvive = plantType.shouldSurvive(neighbors.length);
+                        if (shouldSurvive) {
+                            nextState = currentPlantId;
+                        } else {
+                            nextState = null; // Dies
+                        }
+                    } else {
+                        // Unknown plant? Kill it.
+                        nextState = null;
+                    }
                 } else {
-                    nextState = (neighbors === 3);
+                    // Birth Logic
+                    if (neighbors.length === 3) {
+                        nextState = HybridSystem.resolveBirth(neighbors);
+                    } else {
+                        nextState = null;
+                    }
                 }
                 
                 nextGrid[x][y] = nextState;
-                if (nextState !== isAlive) changed = true;
+                if (nextState !== currentPlantId) changed = true;
             }
         }
 
@@ -65,19 +82,20 @@ export class GridSystem extends Phaser.Events.EventEmitter {
         }
     }
 
-    private countNeighbors(cx: number, cy: number): number {
-        let count = 0;
+    private getNeighbors(cx: number, cy: number): string[] {
+        const neighbors: string[] = [];
         for (let x = -1; x <= 1; x++) {
             for (let y = -1; y <= 1; y++) {
                 if (x === 0 && y === 0) continue;
                 const nx = cx + x;
                 const ny = cy + y;
                 if (nx >= 0 && nx < this.size && ny >= 0 && ny < this.size) {
-                    if (this.grid[nx][ny]) count++;
+                    const cell = this.grid[nx][ny];
+                    if (cell) neighbors.push(cell);
                 }
             }
         }
-        return count;
+        return neighbors;
     }
 
     public reset() {
@@ -85,7 +103,7 @@ export class GridSystem extends Phaser.Events.EventEmitter {
         this.emit(Events.GRID_UPDATED, this.grid);
     }
 
-    public get currentGrid(): boolean[][] {
+    public get currentGrid(): (string | null)[][] {
         return this.grid.map(row => [...row]);
     }
 }

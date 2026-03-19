@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GameStateManager } from '../managers/GameStateManager';
 import { GridSystem } from '../systems/GridSystem';
 import { Events } from '../constants/Events';
+import { PlantFactory } from '../systems/plants/PlantFactory';
 
 export class MainScene extends Phaser.Scene {
     private gridSystem!: GridSystem;
@@ -25,8 +26,11 @@ export class MainScene extends Phaser.Scene {
 
     create() {
         // Initialize Managers
-        this.gameStateManager = new GameStateManager();
-        this.registry.set('gameStateManager', this.gameStateManager);
+        this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
+        if (!this.gameStateManager) {
+             this.gameStateManager = new GameStateManager();
+             this.registry.set('gameStateManager', this.gameStateManager);
+        }
 
         this.gridSystem = new GridSystem(this.GRID_SIZE);
         this.gridSystem.on(Events.GRID_UPDATED, () => this.updateVisuals());
@@ -70,7 +74,8 @@ export class MainScene extends Phaser.Scene {
                 tile.on('pointerdown', () => this.handleTileClick(x, y));
                 this.tileSprites[x][y] = tile;
                 
-                const plant = this.add.sprite(sx, sy, 'plant_sprite');
+                // Initialize with a placeholder texture, hidden
+                const plant = this.add.sprite(sx, sy, 'tile_turnip');
                 plant.setOrigin(0.5, 0); 
                 plant.setVisible(false);
                 this.plantSprites[x][y] = plant;
@@ -90,23 +95,37 @@ export class MainScene extends Phaser.Scene {
     }
 
     private handleTileClick(x: number, y: number) {
-        const turnipCount = this.gameStateManager.getItemCount('turnip');
-        const isAlive = this.gridSystem.isAlive(x, y);
+        const selectedItem = this.gameStateManager.selectedItem;
+        const occupiedId = this.gridSystem.getCell(x, y);
         
-        if (!isAlive && turnipCount > 0) {
-            this.gridSystem.setCell(x, y, true);
-            this.gameStateManager.removeItem('turnip', 1);
-        } else if (isAlive) {
-            this.gridSystem.setCell(x, y, false);
-            this.gameStateManager.addItem('turnip', 1);
+        if (!occupiedId) {
+            // Plant
+            const count = this.gameStateManager.getItemCount(selectedItem);
+            if (count > 0) {
+                this.gridSystem.setCell(x, y, selectedItem);
+                this.gameStateManager.removeItem(selectedItem, 1);
+            }
+        } else {
+            // Harvest
+            this.gridSystem.setCell(x, y, null);
+            this.gameStateManager.addItem(occupiedId, 1);
         }
     }
 
     private updateVisuals() {
         for (let x = 0; x < this.GRID_SIZE; x++) {
             for (let y = 0; y < this.GRID_SIZE; y++) {
-                if (this.plantSprites[x] && this.plantSprites[x][y]) {
-                    this.plantSprites[x][y].setVisible(this.gridSystem.isAlive(x, y));
+                const plantId = this.gridSystem.getCell(x, y);
+                const sprite = this.plantSprites[x][y];
+                
+                if (plantId) {
+                    const plantType = PlantFactory.getPlant(plantId);
+                    if (plantType) {
+                        sprite.setTexture(plantType.asset);
+                        sprite.setVisible(true);
+                    }
+                } else {
+                    sprite.setVisible(false);
                 }
             }
         }

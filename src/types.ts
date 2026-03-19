@@ -26,12 +26,20 @@ export const ITEMS: Record<string, Item> = {
         type: ItemType.Plant,
         buyPrice: 10,
         icon: 'ui_turnip'
+    },
+    'grass_01': {
+        id: 'grass_01',
+        displayName: 'Trawa',
+        type: ItemType.Plant,
+        buyPrice: 4,
+        icon: 'ui_grass'
     }
 };
 
 export const INITIAL_STATE: GameState = {
     gold: 20,
     inventory: {
-        'turnip': 5
+        'turnip': 5,
+        'grass_01': 5
     }
 };

@@ -5,10 +5,19 @@ import { Events } from '../constants/Events';
 
 export class GameStateManager extends Phaser.Events.EventEmitter {
     private state: GameState;
+    private _selectedItem: string = 'turnip';
 
     constructor() {
         super();
         this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+    }
+
+    public get selectedItem(): string {
+        return this._selectedItem;
+    }
+
+    public set selectedItem(item: string) {
+        this._selectedItem = item;
     }
 
     public get gold(): number {
