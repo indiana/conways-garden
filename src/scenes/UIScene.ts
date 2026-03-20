@@ -27,10 +27,10 @@ export class UIScene extends Phaser.Scene {
   
   // Inventory Layout
   private readonly LIST_X = 168; // Aligned with grid left
-  private readonly LIST_START_Y = 900;
-  private readonly ITEM_SPACING = 140;
+  private readonly LIST_START_Y = 820; // Moved up from 900
+  private readonly ITEM_SPACING = 110; // Decreased from 140
   private readonly SLOT_WIDTH = 280; 
-  private readonly SLOT_HEIGHT = 120;
+  private readonly SLOT_HEIGHT = 100; // Decreased from 120
 
   constructor() {
     super("UIScene");
@@ -125,15 +125,18 @@ export class UIScene extends Phaser.Scene {
 
       // Deactivate all others
       Object.entries(tabs).forEach(([key, sceneKey]) => {
+          const targetScene = this.scene.get(sceneKey);
           if (key === tab) {
               // Activate
               if (tab === 'GARDEN') {
-                  this.scene.resume(sceneKey);
+                  if (targetScene.scene.isPaused()) {
+                      this.scene.resume(sceneKey);
+                  }
               } else {
                   this.scene.pause('MainScene');
                   this.scene.setVisible(false, 'MainScene');
                   
-                  if (this.scene.get(sceneKey).scene.isSleeping()) {
+                  if (targetScene.scene.isSleeping()) {
                       this.scene.wake(sceneKey);
                   } else if (!this.scene.isActive(sceneKey)) {
                       this.scene.launch(sceneKey);
@@ -144,10 +147,14 @@ export class UIScene extends Phaser.Scene {
           } else {
               // Deactivate
               if (key === 'GARDEN') {
-                  this.scene.pause(sceneKey);
+                  if (this.scene.isActive(sceneKey) && !this.scene.isPaused(sceneKey)) {
+                    this.scene.pause(sceneKey);
+                  }
                   this.scene.setVisible(false, sceneKey);
               } else {
-                  this.scene.sleep(sceneKey);
+                  if (this.scene.isActive(sceneKey) && !targetScene.scene.isSleeping()) {
+                    this.scene.sleep(sceneKey);
+                  }
                   this.scene.setVisible(false, sceneKey);
               }
           }

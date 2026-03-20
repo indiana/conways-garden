@@ -25,6 +25,10 @@ export class PreloadScene extends Phaser.Scene {
         this.load.image('btn_achievements_active', 'button_achievements_active.png');
         this.load.image('btn_atlas', 'button_atlas.png');
         this.load.image('btn_atlas_active', 'button_atlas_active.png');
+
+        // Achievement Badges
+        this.load.image('badge_uncollected', 'badge_achievement_grayed40.png');
+        this.load.image('badge_collected', 'badge_achievement_earned40.png');
     }
 
     create() {

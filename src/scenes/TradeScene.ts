@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ITEMS } from '../types';
+import { ITEMS, UPGRADES } from '../types';
 import { GameStateManager } from '../managers/GameStateManager';
 import { STYLES } from '../constants/Styles';
 
@@ -78,53 +78,79 @@ export class TradeScene extends Phaser.Scene {
     }
 
     private renderBuyView() {
-        const itemIds = Object.keys(ITEMS);
         let currentY = 400;
 
+        // Render Items
+        const itemIds = Object.keys(ITEMS);
         itemIds.forEach(id => {
             const item = ITEMS[id];
-            
-            // Icon
-            const icon = this.add.sprite(200, currentY, item.icon);
-            this.uiContainer.add(icon);
+            this.renderBuyItem(item.displayName, item.buyPrice, item.icon, currentY, () => {
+                if (this.gameStateManager.spendGold(item.buyPrice)) {
+                    this.gameStateManager.addItem(item.id, 1);
+                    this.refresh();
+                }
+            }, this.gameStateManager.getItemCount(id));
+            currentY += 170;
+        });
 
-            // Inventory Count
-            const count = this.gameStateManager.getItemCount(id);
-            const countText = this.add.text(150, currentY, `${count}`, STYLES.UI_LABEL).setOrigin(0.5);
-            this.uiContainer.add(countText);
+        // Render Upgrades
+        const upgradeIds = Object.keys(UPGRADES);
+        upgradeIds.forEach(id => {
+            const upgrade = UPGRADES[id];
+            const isUnlocked = !upgrade.requirementAchievementId || this.gameStateManager.hasAchievement(upgrade.requirementAchievementId);
+            const isPurchased = this.gameStateManager.hasUpgrade(id);
 
-            // Name & Price
-            const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0, 0.5);
-            const priceLabel = this.add.text(280, currentY + 10, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
-            const priceValue = this.add.text(priceLabel.x + priceLabel.width, currentY + 10, `${item.buyPrice}`, STYLES.PRICE).setOrigin(0, 0.5);
-            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 0, currentY + 10, 'ui_gold').setOrigin(0, 0.5);
-            priceIcon.setScale(50 / priceIcon.width);
-            
-            this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
-
-            // Buy Button
-            const canAfford = this.gameStateManager.gold >= item.buyPrice;
-            const buyBtn = this.add.text(520, currentY, 'KUP', {
-                ...STYLES.UI_LABEL,
-                fontSize: '28px',
-                backgroundColor: canAfford ? '#2ecc71' : '#7f8c8d',
-                padding: { x: 20, y: 10 }
-            })
-            .setOrigin(0.5)
-            .setInteractive();
-
-            if (canAfford) {
-                buyBtn.on('pointerdown', () => {
-                    if (this.gameStateManager.spendGold(item.buyPrice)) {
-                        this.gameStateManager.addItem(item.id, 1);
+            if (isUnlocked && !isPurchased) {
+                this.renderBuyItem(upgrade.displayName, upgrade.cost, 'tile_ground', currentY, () => {
+                    if (this.gameStateManager.buyUpgrade(id)) {
                         this.refresh();
                     }
                 });
+                currentY += 170;
             }
-            this.uiContainer.add(buyBtn);
-            
-            currentY += 170;
         });
+    }
+
+    private renderBuyItem(name: string, price: number, iconKey: string, y: number, onBuy: () => void, count?: number) {
+        // Icon (Moved left to 100 from 200)
+        const icon = this.add.sprite(100, y, iconKey).setScale(0.8);
+        this.uiContainer.add(icon);
+
+        // Inventory Count (optional) (Moved left to 50 from 150)
+        if (count !== undefined) {
+            const countText = this.add.text(50, y, `${count}`, STYLES.UI_LABEL).setOrigin(0.5);
+            this.uiContainer.add(countText);
+        }
+
+        // Name & Price (Moved left to 180 from 280)
+        const nameText = this.add.text(180, y - 40, name, { 
+            ...STYLES.BUTTON, 
+            padding: { x: 0, y: 0 },
+            wordWrap: { width: 320 } // Ensure it doesn't hit the button
+        }).setOrigin(0, 0); // Origin top-left for better wrapping
+
+        const priceLabel = this.add.text(180, y + 25, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
+        const priceValue = this.add.text(priceLabel.x + priceLabel.width, y + 25, `${price}`, STYLES.PRICE).setOrigin(0, 0.5);
+        const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 0, y + 25, 'ui_gold').setOrigin(0, 0.5);
+        priceIcon.setScale(50 / priceIcon.width);
+        
+        this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
+
+        // Buy Button (Moved right to 600 from 520)
+        const canAfford = this.gameStateManager.gold >= price;
+        const buyBtn = this.add.text(600, y, 'KUP', {
+            ...STYLES.UI_LABEL,
+            fontSize: '28px',
+            backgroundColor: canAfford ? '#2ecc71' : '#7f8c8d',
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+        if (canAfford) {
+            buyBtn.on('pointerdown', onBuy);
+        }
+        this.uiContainer.add(buyBtn);
     }
 
     private renderSellView() {
@@ -141,26 +167,31 @@ export class TradeScene extends Phaser.Scene {
             const item = ITEMS[id];
             const sellPrice = Math.floor(item.buyPrice * 0.5);
 
-            // Icon
-            const icon = this.add.sprite(200, currentY, item.icon);
+            // Icon (Moved left to 100 from 200)
+            const icon = this.add.sprite(100, currentY, item.icon).setScale(0.8);
             this.uiContainer.add(icon);
 
-            // Inventory Count
+            // Inventory Count (Moved left to 50 from 150)
             const count = this.gameStateManager.getItemCount(id);
-            const countText = this.add.text(150, currentY, `${count}`, STYLES.UI_LABEL).setOrigin(0.5);
+            const countText = this.add.text(50, currentY, `${count}`, STYLES.UI_LABEL).setOrigin(0.5);
             this.uiContainer.add(countText);
 
-            // Name & Price
-            const nameText = this.add.text(280, currentY - 30, item.displayName, { ...STYLES.BUTTON, padding: { x: 0, y: 0 } }).setOrigin(0, 0.5);
-            const priceLabel = this.add.text(280, currentY + 10, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
-            const priceValue = this.add.text(priceLabel.x + priceLabel.width, currentY + 10, `${sellPrice}`, STYLES.PRICE).setOrigin(0, 0.5);
-            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 0, currentY + 10, 'ui_gold').setOrigin(0, 0.5);
+            // Name & Price (Moved left to 180 from 280)
+            const nameText = this.add.text(180, currentY - 40, item.displayName, { 
+                ...STYLES.BUTTON, 
+                padding: { x: 0, y: 0 },
+                wordWrap: { width: 320 }
+            }).setOrigin(0, 0);
+
+            const priceLabel = this.add.text(180, currentY + 25, 'Cena: ', STYLES.PRICE).setOrigin(0, 0.5);
+            const priceValue = this.add.text(priceLabel.x + priceLabel.width, currentY + 25, `${sellPrice}`, STYLES.PRICE).setOrigin(0, 0.5);
+            const priceIcon = this.add.sprite(priceValue.x + priceValue.width + 0, currentY + 25, 'ui_gold').setOrigin(0, 0.5);
             priceIcon.setScale(50 / priceIcon.width);
             
             this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
 
-            // Sell Button
-            const sellBtn = this.add.text(520, currentY, 'SPRZEDAJ', {
+            // Sell Button (Moved right to 600 from 520)
+            const sellBtn = this.add.text(600, currentY, 'SPRZEDAJ', {
                 ...STYLES.UI_LABEL,
                 fontSize: '28px',
                 backgroundColor: '#e74c3c',

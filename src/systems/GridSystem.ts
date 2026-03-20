@@ -5,7 +5,7 @@ import { HybridSystem } from './HybridSystem';
 
 export class GridSystem extends Phaser.Events.EventEmitter {
     private grid: (string | null)[][] = [];
-    private readonly size: number;
+    private size: number;
 
     constructor(size: number) {
         super();
@@ -14,12 +14,35 @@ export class GridSystem extends Phaser.Events.EventEmitter {
     }
 
     private initGrid() {
+        this.grid = [];
         for (let x = 0; x < this.size; x++) {
             this.grid[x] = [];
             for (let y = 0; y < this.size; y++) {
                 this.grid[x][y] = null;
             }
         }
+    }
+
+    public resize(newSize: number) {
+        const newGrid: (string | null)[][] = [];
+        for (let x = 0; x < newSize; x++) {
+            newGrid[x] = [];
+            for (let y = 0; y < newSize; y++) {
+                // Copy old value if within bounds
+                if (x < this.size && y < this.size) {
+                    newGrid[x][y] = this.grid[x][y];
+                } else {
+                    newGrid[x][y] = null;
+                }
+            }
+        }
+        this.grid = newGrid;
+        this.size = newSize;
+        this.emit(Events.GRID_UPDATED, this.grid);
+    }
+
+    public get currentSize(): number {
+        return this.size;
     }
 
     public isAlive(x: number, y: number): boolean {
