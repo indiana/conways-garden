@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { LAYOUT } from '../../constants/Layout';
+import { LocaleManager } from '../../managers/LocaleManager';
 
 export type NavTab = 'GARDEN' | 'TRADE' | 'ACHIEVEMENTS' | 'ATLAS';
 
@@ -7,10 +8,12 @@ export class NavigationBar extends Phaser.GameObjects.Container {
     private navButtons: Record<NavTab, Phaser.GameObjects.Sprite> = {} as any;
     private onTabSwitch: (tab: NavTab) => void;
     private activeTab: NavTab = 'GARDEN';
+    private localeManager: LocaleManager;
 
-    constructor(scene: Phaser.Scene, y: number, onTabSwitch: (tab: NavTab) => void) {
+    constructor(scene: Phaser.Scene, localeManager: LocaleManager, y: number, onTabSwitch: (tab: NavTab) => void) {
         super(scene, 0, y);
         this.onTabSwitch = onTabSwitch;
+        this.localeManager = localeManager;
 
         const spacing = 170;
         const startX = LAYOUT.CENTER_X - (spacing * 1.5);
@@ -28,6 +31,11 @@ export class NavigationBar extends Phaser.GameObjects.Container {
         ]);
 
         this.updateVisuals();
+        
+        // Refresh visuals on locale change if needed (though buttons are mostly icons, 
+        // some might have text or tooltips in the future)
+        this.localeManager.subscribeLocale(() => this.updateVisuals());
+        
         scene.add.existing(this);
     }
 

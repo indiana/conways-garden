@@ -13,6 +13,7 @@ export class TradeScene extends Phaser.Scene {
     private localeManager!: LocaleManager;
     
     // UI Elements
+    private titleText!: Phaser.GameObjects.Text;
     private tabBuyBtn!: Phaser.GameObjects.Text;
     private tabSellBtn!: Phaser.GameObjects.Text;
     
@@ -31,11 +32,11 @@ export class TradeScene extends Phaser.Scene {
             .setInteractive(); // Block input
 
         // Title
-        this.add.text(LAYOUT.CENTER_X, LAYOUT.TRADE_TITLE_Y, this.localeManager.get('TAB_TRADE'), STYLES.TITLE).setOrigin(0.5);
+        this.titleText = this.add.text(LAYOUT.CENTER_X, LAYOUT.TRADE_TITLE_Y, '', STYLES.TITLE).setOrigin(0.5);
 
         // Tabs
-        this.tabBuyBtn = this.createTab(LAYOUT.CENTER_X - 100, LAYOUT.TRADE_TABS_Y, this.localeManager.get('TRADE_BUY'), 'BUY');
-        this.tabSellBtn = this.createTab(LAYOUT.CENTER_X + 100, LAYOUT.TRADE_TABS_Y, this.localeManager.get('TRADE_SELL'), 'SELL');
+        this.tabBuyBtn = this.createTab(LAYOUT.CENTER_X - 100, LAYOUT.TRADE_TABS_Y, '', 'BUY');
+        this.tabSellBtn = this.createTab(LAYOUT.CENTER_X + 100, LAYOUT.TRADE_TABS_Y, '', 'SELL');
 
         // Content Container
         this.uiContainer = this.add.container(0, 0);
@@ -71,6 +72,11 @@ export class TradeScene extends Phaser.Scene {
 
     private refresh() {
         if (!this.uiContainer) return; // Prevent refresh before create
+
+        // Update Static Text
+        if (this.titleText) this.titleText.setText(this.localeManager.get('TAB_TRADE'));
+        if (this.tabBuyBtn) this.tabBuyBtn.setText(this.localeManager.get('TRADE_BUY'));
+        if (this.tabSellBtn) this.tabSellBtn.setText(this.localeManager.get('TRADE_SELL'));
 
         // Update Tab Styles
         const activeBg = `#${this.ACCENT_COLOR.toString(16)}`;

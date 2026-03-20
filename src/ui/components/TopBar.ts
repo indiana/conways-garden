@@ -2,15 +2,18 @@ import Phaser from 'phaser';
 import { STYLES } from '../../constants/Styles';
 import { LAYOUT } from '../../constants/Layout';
 import { GameStateManager } from '../../managers/GameStateManager';
+import { LocaleManager } from '../../managers/LocaleManager';
 
 export class TopBar extends Phaser.GameObjects.Container {
     private goldText: Phaser.GameObjects.Text;
     private goldIcon: Phaser.GameObjects.Sprite;
     private onMenuClick: () => void;
+    private localeManager: LocaleManager;
 
-    constructor(scene: Phaser.Scene, gsm: GameStateManager, onMenuClick: () => void) {
+    constructor(scene: Phaser.Scene, gsm: GameStateManager, localeManager: LocaleManager, onMenuClick: () => void) {
         super(scene, 0, 0);
         this.onMenuClick = onMenuClick;
+        this.localeManager = localeManager;
 
         // Gold Display
         const y = LAYOUT.TOP_BAR_Y;
@@ -35,6 +38,9 @@ export class TopBar extends Phaser.GameObjects.Container {
         
         // Subscribe to gold changes
         gsm.subscribeGold((gold) => this.updateGold(gold));
+        
+        // Refresh on locale change (if top bar had text other than numbers)
+        this.localeManager.subscribeLocale(() => {});
         
         scene.add.existing(this);
     }

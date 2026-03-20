@@ -30,10 +30,10 @@ export class UIScene extends Phaser.Scene {
     this.localeManager = this.registry.get("localeManager") as LocaleManager;
 
     // 1. Top Bar (Gold + Hamburger)
-    new TopBar(this, this.gameStateManager, () => this.menuOverlay.toggle());
+    new TopBar(this, this.gameStateManager, this.localeManager, () => this.menuOverlay.toggle());
 
     // 2. Navigation Bar
-    this.navBar = new NavigationBar(this, LAYOUT.NAV_BAR_Y, (tab) => this.switchTab(tab));
+    this.navBar = new NavigationBar(this, this.localeManager, LAYOUT.NAV_BAR_Y, (tab) => this.switchTab(tab));
 
     // 3. Menu Overlay
     this.menuOverlay = new MenuOverlay(this, this.localeManager, () => {
