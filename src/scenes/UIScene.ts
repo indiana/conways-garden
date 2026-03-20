@@ -133,7 +133,10 @@ export class UIScene extends Phaser.Scene {
                       this.scene.resume(sceneKey);
                   }
               } else {
-                  this.scene.pause('MainScene');
+                  // Only pause MainScene if it is active and not already paused
+                  if (this.scene.isActive('MainScene') && !this.scene.isPaused('MainScene')) {
+                    this.scene.pause('MainScene');
+                  }
                   this.scene.setVisible(false, 'MainScene');
                   
                   if (targetScene.scene.isSleeping()) {
