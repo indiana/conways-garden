@@ -6,7 +6,8 @@ export const Events = {
     ACHIEVEMENT_UNLOCKED: 'achievement-unlocked',
     UPGRADE_PURCHASED: 'upgrade-purchased',
     GRID_SIZE_CHANGED: 'grid-size-changed',
-    GAME_RESET: 'game-reset'
+    GAME_RESET: 'game-reset',
+    LOCALE_CHANGED: 'locale-changed'
 } as const;
 
 export type Events = typeof Events[keyof typeof Events];

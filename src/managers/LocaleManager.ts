@@ -1,3 +1,6 @@
+import Phaser from 'phaser';
+import { Events } from '../constants/Events';
+
 export type Locale = 'PL' | 'EN';
 
 export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
@@ -10,7 +13,8 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
         'UPGRADE_GRID_5X5': 'Powiększenie ogrodu (5x5)',
         'UPGRADE_GRID_5X5_DESC': 'Zwiększa obszar ogrodu do 5x5.',
         'MENU_RESET': 'Zresetuj grę',
-        'MENU_LANGUAGE': 'Język EN/PL',
+        'MENU_LANGUAGE_TO_EN': 'English language',
+        'MENU_LANGUAGE_TO_PL': 'Język polski',
         'TAB_GARDEN': 'OGRÓD',
         'TAB_TRADE': 'HANDEL',
         'TAB_ACHIEVEMENTS': 'OSIĄGNIĘCIA',
@@ -30,7 +34,8 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
         'UPGRADE_GRID_5X5': 'Garden Expansion (5x5)',
         'UPGRADE_GRID_5X5_DESC': 'Increases garden area to 5x5.',
         'MENU_RESET': 'Reset Game',
-        'MENU_LANGUAGE': 'Language EN/PL',
+        'MENU_LANGUAGE_TO_EN': 'English language',
+        'MENU_LANGUAGE_TO_PL': 'Język polski',
         'TAB_GARDEN': 'GARDEN',
         'TAB_TRADE': 'TRADE',
         'TAB_ACHIEVEMENTS': 'ACHIEVEMENTS',
@@ -43,11 +48,23 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     }
 };
 
-export class LocaleManager {
+export class LocaleManager extends Phaser.Events.EventEmitter {
     private currentLocale: Locale = 'PL';
+    private readonly STORAGE_KEY = 'conways_garden_locale';
+
+    constructor() {
+        super();
+        const savedLocale = localStorage.getItem(this.STORAGE_KEY) as Locale;
+        if (savedLocale && (savedLocale === 'PL' || savedLocale === 'EN')) {
+            this.currentLocale = savedLocale;
+        }
+    }
 
     public setLocale(locale: Locale) {
+        if (this.currentLocale === locale) return;
         this.currentLocale = locale;
+        localStorage.setItem(this.STORAGE_KEY, locale);
+        this.emit(Events.LOCALE_CHANGED, locale);
     }
 
     public get(key: string): string {
@@ -56,5 +73,10 @@ export class LocaleManager {
 
     public getLocale(): Locale {
         return this.currentLocale;
+    }
+
+    public subscribeLocale(callback: (locale: Locale) => void) {
+        this.on(Events.LOCALE_CHANGED, callback);
+        callback(this.currentLocale);
     }
 }

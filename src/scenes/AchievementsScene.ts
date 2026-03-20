@@ -9,6 +9,7 @@ export class AchievementsScene extends Phaser.Scene {
     private gameStateManager!: GameStateManager;
     private localeManager!: LocaleManager;
     private uiContainer!: Phaser.GameObjects.Container;
+    private titleText!: Phaser.GameObjects.Text;
 
     constructor() {
         super('AchievementsScene');
@@ -23,12 +24,16 @@ export class AchievementsScene extends Phaser.Scene {
             .setInteractive(); // Block input
 
         // Title
-        this.add.text(LAYOUT.CENTER_X, LAYOUT.ACHIEVEMENTS_TITLE_Y, this.localeManager.get('TAB_ACHIEVEMENTS'), STYLES.TITLE).setOrigin(0.5);
+        this.titleText = this.add.text(LAYOUT.CENTER_X, LAYOUT.ACHIEVEMENTS_TITLE_Y, '', STYLES.TITLE).setOrigin(0.5);
 
         this.uiContainer = this.add.container(0, 0);
 
-        // Reactive binding
+        // Reactive bindings
         this.gameStateManager.subscribeAchievements(() => this.renderAchievements());
+        this.localeManager.subscribeLocale(() => {
+            this.titleText.setText(this.localeManager.get('TAB_ACHIEVEMENTS'));
+            this.renderAchievements();
+        });
         
         this.events.on('wake', () => this.renderAchievements());
     }

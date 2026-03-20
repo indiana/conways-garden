@@ -44,6 +44,7 @@ export class TradeScene extends Phaser.Scene {
         this.gameStateManager.subscribeGold(() => this.refresh());
         this.gameStateManager.subscribeInventory(() => this.refresh());
         this.gameStateManager.subscribeAchievements(() => this.refresh());
+        this.localeManager.subscribeLocale(() => this.refresh());
         
         // Listen for wake event to reset view
         this.events.on('wake', () => {

@@ -6,6 +6,8 @@ import { LAYOUT } from '../../constants/Layout';
 export class MenuOverlay extends Phaser.GameObjects.Container {
     private isOpen: boolean = false;
     private localeManager: LocaleManager;
+    private resetBtn: Phaser.GameObjects.Text;
+    private langBtn: Phaser.GameObjects.Text;
 
     constructor(scene: Phaser.Scene, localeManager: LocaleManager, onReset: () => void) {
         super(scene, 0, 0);
@@ -26,7 +28,7 @@ export class MenuOverlay extends Phaser.GameObjects.Container {
         panel.setStrokeStyle(4, 0xffffff);
 
         // Menu Items
-        const resetBtn = scene.add.text(LAYOUT.CENTER_X, LAYOUT.CENTER_Y - 40, this.localeManager.get('MENU_RESET'), STYLES.UI_LABEL)
+        this.resetBtn = scene.add.text(LAYOUT.CENTER_X, LAYOUT.CENTER_Y - 40, '', STYLES.UI_LABEL)
             .setOrigin(0.5)
             .setInteractive()
             .on('pointerdown', () => {
@@ -34,20 +36,28 @@ export class MenuOverlay extends Phaser.GameObjects.Container {
                 this.toggle();
             });
 
-        const langBtn = scene.add.text(LAYOUT.CENTER_X, LAYOUT.CENTER_Y + 40, this.localeManager.get('MENU_LANGUAGE'), { ...STYLES.UI_LABEL, color: '#7f8c8d' })
+        this.langBtn = scene.add.text(LAYOUT.CENTER_X, LAYOUT.CENTER_Y + 40, '', { ...STYLES.UI_LABEL, color: '#ffffff' })
             .setOrigin(0.5)
             .setInteractive()
             .on('pointerdown', () => {
                 const nextLocale = this.localeManager.getLocale() === 'PL' ? 'EN' : 'PL';
                 this.localeManager.setLocale(nextLocale);
-                // In a real app, you'd trigger a full UI refresh here.
-                // For now, let's just log it.
-                console.log(`Language switched to ${nextLocale} (UI refresh needed)`);
-                this.toggle();
             });
 
-        this.add([bg, panel, resetBtn, langBtn]);
+        this.add([bg, panel, this.resetBtn, this.langBtn]);
+        
+        // Subscribe to locale changes to update text
+        this.localeManager.subscribeLocale(() => this.updateText());
+        
         scene.add.existing(this);
+    }
+
+    private updateText() {
+        this.resetBtn.setText(this.localeManager.get('MENU_RESET'));
+        
+        const currentLocale = this.localeManager.getLocale();
+        const langKey = currentLocale === 'PL' ? 'MENU_LANGUAGE_TO_EN' : 'MENU_LANGUAGE_TO_PL';
+        this.langBtn.setText(this.localeManager.get(langKey));
     }
 
     public toggle() {
