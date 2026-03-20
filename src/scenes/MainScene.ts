@@ -51,6 +51,21 @@ export class MainScene extends Phaser.Scene {
             this.drawGrid(true, oldSize);
         });
 
+        this.gameStateManager.on(Events.GAME_RESET, () => {
+            this.handleGameReset();
+        });
+
+        this.updateVisuals();
+    }
+
+    private handleGameReset() {
+        this.gridSystem.reset();
+        this.pulseTimer.reset({
+            delay: this.PULSE_INTERVAL,
+            callback: () => this.gridSystem.executePulse(),
+            callbackScope: this,
+            loop: true
+        });
         this.updateVisuals();
     }
 
@@ -166,12 +181,5 @@ export class MainScene extends Phaser.Scene {
 
     public resetGame() {
         this.gameStateManager.reset();
-        this.gridSystem.reset();
-        this.pulseTimer.reset({
-            delay: this.PULSE_INTERVAL,
-            callback: () => this.gridSystem.executePulse(),
-            callbackScope: this,
-            loop: true
-        });
     }
 }

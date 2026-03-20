@@ -116,6 +116,7 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
 
     public reset() {
         this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+        this.emit(Events.GAME_RESET);
         this.emit(Events.GOLD_CHANGED, this.state.gold);
         this.emit(Events.INVENTORY_CHANGED, this.state.inventory);
         this.emit(Events.GRID_SIZE_CHANGED, this.state.gridSize);

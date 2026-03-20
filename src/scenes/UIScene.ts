@@ -20,6 +20,10 @@ export class UIScene extends Phaser.Scene {
   private activeTab: NavTab = 'GARDEN';
   private navButtons: Record<NavTab, Phaser.GameObjects.Sprite> = {} as any;
 
+  // Hamburger Menu
+  private menuOverlay!: Phaser.GameObjects.Container;
+  private isMenuOpen: boolean = false;
+
   private gameStateManager!: GameStateManager;
 
   private readonly UI_CENTER_X = 360;
@@ -87,6 +91,66 @@ export class UIScene extends Phaser.Scene {
 
     // Initial Visibility
     this.updateGardenElementsVisibility();
+
+    // Hamburger Menu
+    this.createHamburgerMenu();
+  }
+
+  private createHamburgerMenu() {
+      // 1. Hamburger Icon
+      const x = 680;
+      const y = 40;
+      const size = 40;
+      const graphics = this.add.graphics();
+      graphics.lineStyle(4, 0xffffff);
+      graphics.strokeLineShape(new Phaser.Geom.Line(x - size/2, y - 10, x + size/2, y - 10));
+      graphics.strokeLineShape(new Phaser.Geom.Line(x - size/2, y, x + size/2, y));
+      graphics.strokeLineShape(new Phaser.Geom.Line(x - size/2, y + 10, x + size/2, y + 10));
+
+      const hitArea = this.add.zone(x, y, size + 20, size + 20).setInteractive();
+      hitArea.on('pointerdown', () => this.toggleMenu());
+
+      // 2. Menu Overlay
+      this.menuOverlay = this.add.container(0, 0);
+      this.menuOverlay.setVisible(false);
+      this.menuOverlay.setDepth(1000);
+
+      // Semi-transparent background
+      const bg = this.add.rectangle(360, 640, 720, 1280, 0x000000, 0.7);
+      bg.setInteractive();
+      bg.on('pointerdown', () => this.toggleMenu());
+      this.menuOverlay.add(bg);
+
+      // Menu Panel
+      const panelWidth = 400;
+      const panelHeight = 300;
+      const panel = this.add.rectangle(360, 640, panelWidth, panelHeight, 0x2d3436);
+      panel.setStrokeStyle(4, 0xffffff);
+      this.menuOverlay.add(panel);
+
+      // Menu Items
+      const resetBtn = this.add.text(360, 600, 'Zresetuj grę', STYLES.UI_LABEL)
+          .setOrigin(0.5)
+          .setInteractive()
+          .on('pointerdown', () => {
+              this.gameStateManager.reset();
+              this.toggleMenu();
+              this.switchTab('GARDEN');
+          });
+
+      const langBtn = this.add.text(360, 680, 'Język EN/PL', { ...STYLES.UI_LABEL, color: '#7f8c8d' })
+          .setOrigin(0.5)
+          .setInteractive()
+          .on('pointerdown', () => {
+              console.log('Language switch clicked (placeholder)');
+          });
+
+      this.menuOverlay.add([resetBtn, langBtn]);
+  }
+
+  private toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen;
+      this.menuOverlay.setVisible(this.isMenuOpen);
   }
 
   private createNavBar() {
