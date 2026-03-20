@@ -40,10 +40,12 @@ export class TradeScene extends Phaser.Scene {
         // Content Container
         this.uiContainer = this.add.container(0, 0);
 
-        // Initial Refresh
-        this.refresh();
+        // Reactive bindings
+        this.gameStateManager.subscribeGold(() => this.refresh());
+        this.gameStateManager.subscribeInventory(() => this.refresh());
+        this.gameStateManager.subscribeAchievements(() => this.refresh());
         
-        // Listen for wake event to refresh state
+        // Listen for wake event to reset view
         this.events.on('wake', () => {
             this.currentTab = 'BUY';
             this.refresh();
@@ -67,10 +69,12 @@ export class TradeScene extends Phaser.Scene {
     }
 
     private refresh() {
+        if (!this.uiContainer) return; // Prevent refresh before create
+
         // Update Tab Styles
         const activeBg = `#${this.ACCENT_COLOR.toString(16)}`;
-        this.tabBuyBtn.setStyle({ backgroundColor: this.currentTab === 'BUY' ? activeBg : '#636e72' });
-        this.tabSellBtn.setStyle({ backgroundColor: this.currentTab === 'SELL' ? activeBg : '#636e72' });
+        if (this.tabBuyBtn) this.tabBuyBtn.setStyle({ backgroundColor: this.currentTab === 'BUY' ? activeBg : '#636e72' });
+        if (this.tabSellBtn) this.tabSellBtn.setStyle({ backgroundColor: this.currentTab === 'SELL' ? activeBg : '#636e72' });
 
         // Clear previous content
         this.uiContainer.removeAll(true);
@@ -90,9 +94,7 @@ export class TradeScene extends Phaser.Scene {
         itemIds.forEach(id => {
             const item = ITEMS[id];
             this.renderBuyItem(this.localeManager.get(item.displayNameKey), item.buyPrice, item.icon, currentY, () => {
-                if (GameActions.buyItem(this.gameStateManager, item.id)) {
-                    this.refresh();
-                }
+                GameActions.buyItem(this.gameStateManager, item.id);
             }, this.gameStateManager.getItemCount(id));
             currentY += LAYOUT.TRADE_ITEM_SPACING;
         });
@@ -106,9 +108,7 @@ export class TradeScene extends Phaser.Scene {
 
             if (isUnlocked && !isPurchased) {
                 this.renderBuyItem(this.localeManager.get(upgrade.displayNameKey), upgrade.cost, 'tile_ground', currentY, () => {
-                    if (GameActions.buyUpgrade(this.gameStateManager, id)) {
-                        this.refresh();
-                    }
+                    GameActions.buyUpgrade(this.gameStateManager, id);
                 });
                 currentY += LAYOUT.TRADE_ITEM_SPACING;
             }
@@ -206,9 +206,7 @@ export class TradeScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive()
             .on('pointerdown', () => {
-                if (GameActions.sellItem(this.gameStateManager, id)) {
-                    this.refresh();
-                }
+                GameActions.sellItem(this.gameStateManager, id);
             });
             this.uiContainer.add(sellBtn);
             

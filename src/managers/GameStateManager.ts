@@ -121,4 +121,28 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
         this.emit(Events.INVENTORY_CHANGED, this.state.inventory);
         this.emit(Events.GRID_SIZE_CHANGED, this.state.gridSize);
     }
+
+    // --- Subscription Methods ---
+
+    public subscribeGold(callback: (gold: number) => void) {
+        this.on(Events.GOLD_CHANGED, callback);
+        callback(this.gold);
+    }
+
+    public subscribeInventory(callback: (inventory: Record<string, number>) => void) {
+        this.on(Events.INVENTORY_CHANGED, callback);
+        callback(this.inventory);
+    }
+
+    public subscribeAchievements(callback: (achievements: string[]) => void) {
+        this.on(Events.ACHIEVEMENT_UNLOCKED, () => callback(this.state.achievements));
+        this.on(Events.GAME_RESET, () => callback(this.state.achievements));
+        callback(this.state.achievements);
+    }
+
+    public subscribeUpgrades(callback: (upgrades: string[]) => void) {
+        this.on(Events.UPGRADE_PURCHASED, () => callback(this.state.upgrades));
+        this.on(Events.GAME_RESET, () => callback(this.state.upgrades));
+        callback(this.state.upgrades);
+    }
 }

@@ -12,7 +12,6 @@ import { RadialTimer } from "../ui/components/RadialTimer";
 import { LAYOUT } from "../constants/Layout";
 
 export class UIScene extends Phaser.Scene {
-  private topBar!: TopBar;
   private navBar!: NavigationBar;
   private menuOverlay!: MenuOverlay;
   private inventoryList!: InventoryList;
@@ -31,8 +30,7 @@ export class UIScene extends Phaser.Scene {
     this.localeManager = this.registry.get("localeManager") as LocaleManager;
 
     // 1. Top Bar (Gold + Hamburger)
-    this.topBar = new TopBar(this, () => this.menuOverlay.toggle());
-    this.topBar.updateGold(this.gameStateManager.gold);
+    new TopBar(this, this.gameStateManager, () => this.menuOverlay.toggle());
 
     // 2. Navigation Bar
     this.navBar = new NavigationBar(this, LAYOUT.NAV_BAR_Y, (tab) => this.switchTab(tab));
@@ -46,25 +44,9 @@ export class UIScene extends Phaser.Scene {
 
     // 4. Inventory List
     this.inventoryList = new InventoryList(this, this.gameStateManager);
-    this.inventoryList.updateCounts(this.gameStateManager.inventory);
-    this.inventoryList.updateSelectionHighlight();
 
     // 5. Radial Timer
     this.radialTimer = new RadialTimer(this);
-
-    // Event Listeners
-    if (this.gameStateManager) {
-      this.gameStateManager.on(Events.GOLD_CHANGED, (gold: number) => {
-        this.topBar.updateGold(gold);
-      });
-
-      this.gameStateManager.on(
-        Events.INVENTORY_CHANGED,
-        (inventory: Record<string, number>) => {
-          this.inventoryList.updateCounts(inventory);
-        },
-      );
-    }
 
     const mainScene = this.scene.get("MainScene") as MainScene;
     if (mainScene) {

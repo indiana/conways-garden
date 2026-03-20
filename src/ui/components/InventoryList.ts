@@ -13,6 +13,11 @@ export class InventoryList extends Phaser.GameObjects.Container {
         this.gameStateManager = gameStateManager;
 
         this.createInventoryList();
+        
+        // Reactive bindings
+        gameStateManager.subscribeInventory((inv) => this.updateCounts(inv));
+        this.updateSelectionHighlight(); // Initial
+        
         scene.add.existing(this);
     }
 
@@ -54,7 +59,7 @@ export class InventoryList extends Phaser.GameObjects.Container {
         this.add([frame, zone, icon, text]);
     }
 
-    public updateCounts(inventory: Record<string, number>) {
+    private updateCounts(inventory: Record<string, number>) {
         if (this.countTexts['turnip']) {
             this.countTexts['turnip'].setText(`x${inventory['turnip'] || 0}`);
         }

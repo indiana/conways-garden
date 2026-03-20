@@ -26,12 +26,16 @@ export class AchievementsScene extends Phaser.Scene {
         this.add.text(LAYOUT.CENTER_X, LAYOUT.ACHIEVEMENTS_TITLE_Y, this.localeManager.get('TAB_ACHIEVEMENTS'), STYLES.TITLE).setOrigin(0.5);
 
         this.uiContainer = this.add.container(0, 0);
-        this.renderAchievements();
+
+        // Reactive binding
+        this.gameStateManager.subscribeAchievements(() => this.renderAchievements());
         
         this.events.on('wake', () => this.renderAchievements());
     }
 
     private renderAchievements() {
+        if (!this.uiContainer) return;
+
         this.uiContainer.removeAll(true);
         
         let currentY = LAYOUT.ACHIEVEMENTS_LIST_START_Y;

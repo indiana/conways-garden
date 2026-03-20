@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
 import { STYLES } from '../../constants/Styles';
 import { LAYOUT } from '../../constants/Layout';
+import { GameStateManager } from '../../managers/GameStateManager';
 
 export class TopBar extends Phaser.GameObjects.Container {
     private goldText: Phaser.GameObjects.Text;
     private goldIcon: Phaser.GameObjects.Sprite;
     private onMenuClick: () => void;
 
-    constructor(scene: Phaser.Scene, onMenuClick: () => void) {
+    constructor(scene: Phaser.Scene, gsm: GameStateManager, onMenuClick: () => void) {
         super(scene, 0, 0);
         this.onMenuClick = onMenuClick;
 
@@ -31,10 +32,14 @@ export class TopBar extends Phaser.GameObjects.Container {
         hitArea.on('pointerdown', () => this.onMenuClick());
 
         this.add([this.goldText, this.goldIcon, menuGraphics, hitArea]);
+        
+        // Subscribe to gold changes
+        gsm.subscribeGold((gold) => this.updateGold(gold));
+        
         scene.add.existing(this);
     }
 
-    public updateGold(gold: number) {
+    private updateGold(gold: number) {
         this.goldText.setText(`${gold}`);
         this.goldIcon.setX(this.goldText.x + this.goldText.width + 10);
     }
