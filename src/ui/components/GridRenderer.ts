@@ -2,15 +2,13 @@ import Phaser from 'phaser';
 import { ISO_TILE_WIDTH, ISO_TILE_HEIGHT, IsoUtils } from '../../utils/IsoUtils';
 import { GridSystem } from '../../systems/GridSystem';
 import { PlantFactory } from '../../systems/plants/PlantFactory';
+import { LAYOUT } from '../../constants/Layout';
 
 export class GridRenderer extends Phaser.Events.EventEmitter {
     private scene: Phaser.Scene;
     private tileSprites: Phaser.GameObjects.Sprite[][] = [];
     private plantSprites: Phaser.GameObjects.Sprite[][] = [];
     private gridGroup: Phaser.GameObjects.Group;
-
-    private readonly ORIGIN_X = 360; 
-    private readonly ORIGIN_Y = 500; 
 
     constructor(scene: Phaser.Scene) {
         super();
@@ -29,7 +27,7 @@ export class GridRenderer extends Phaser.Events.EventEmitter {
             this.tileSprites[x] = [];
             this.plantSprites[x] = [];
             for (let y = 0; y < currentSize; y++) {
-                const { sx, sy } = IsoUtils.cartesianToIsometric(x, y, currentSize, this.ORIGIN_X, this.ORIGIN_Y);
+                const { sx, sy } = IsoUtils.cartesianToIsometric(x, y, currentSize, LAYOUT.GRID_ORIGIN_X, LAYOUT.GRID_ORIGIN_Y);
                 
                 const tile = this.scene.add.sprite(sx, sy, 'tile_ground');
                 tile.setOrigin(0.5, 0); 

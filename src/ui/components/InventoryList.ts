@@ -1,17 +1,12 @@
 import Phaser from 'phaser';
 import { STYLES } from '../../constants/Styles';
 import { GameStateManager } from '../../managers/GameStateManager';
+import { LAYOUT } from '../../constants/Layout';
 
 export class InventoryList extends Phaser.GameObjects.Container {
     private selectionFrames: Record<string, Phaser.GameObjects.Graphics> = {};
     private countTexts: Record<string, Phaser.GameObjects.Text> = {};
     private gameStateManager: GameStateManager;
-
-    private readonly LIST_X = 168;
-    private readonly LIST_START_Y = 820;
-    private readonly ITEM_SPACING = 110;
-    private readonly SLOT_WIDTH = 280; 
-    private readonly SLOT_HEIGHT = 100;
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager) {
         super(scene, 0, 0);
@@ -33,15 +28,15 @@ export class InventoryList extends Phaser.GameObjects.Container {
     }
 
     private createInventoryItem(index: number, itemId: string, iconKey: string) {
-        const x = this.LIST_X;
-        const y = this.LIST_START_Y + (index * this.ITEM_SPACING);
+        const x = LAYOUT.INVENTORY_LIST_X;
+        const y = LAYOUT.INVENTORY_LIST_START_Y + (index * LAYOUT.INVENTORY_ITEM_SPACING);
 
         // Selection Frame
         const frame = this.scene.add.graphics();
         this.selectionFrames[itemId] = frame;
 
         // Interactive Zone
-        const zone = this.scene.add.zone(x + this.SLOT_WIDTH / 2 - 20, y, this.SLOT_WIDTH, this.SLOT_HEIGHT)
+        const zone = this.scene.add.zone(x + LAYOUT.INVENTORY_SLOT_WIDTH / 2 - 20, y, LAYOUT.INVENTORY_SLOT_WIDTH, LAYOUT.INVENTORY_SLOT_HEIGHT)
             .setOrigin(0.5)
             .setInteractive();
         zone.on('pointerdown', () => {
@@ -74,14 +69,14 @@ export class InventoryList extends Phaser.GameObjects.Container {
         Object.keys(this.selectionFrames).forEach(itemId => {
             const frame = this.selectionFrames[itemId];
             const index = itemId === 'turnip' ? 0 : 1; 
-            const x = this.LIST_X - 10;
-            const y = this.LIST_START_Y + (index * this.ITEM_SPACING);
+            const x = LAYOUT.INVENTORY_LIST_X - 10;
+            const y = LAYOUT.INVENTORY_LIST_START_Y + (index * LAYOUT.INVENTORY_ITEM_SPACING);
 
             frame.clear();
             
             if (itemId === selectedItem) {
                 frame.lineStyle(4, 0x7f8c8d, 1);
-                frame.strokeRoundedRect(x, y - this.SLOT_HEIGHT / 2, this.SLOT_WIDTH, this.SLOT_HEIGHT, 15);
+                frame.strokeRoundedRect(x, y - LAYOUT.INVENTORY_SLOT_HEIGHT / 2, LAYOUT.INVENTORY_SLOT_WIDTH, LAYOUT.INVENTORY_SLOT_HEIGHT, 15);
             }
         });
     }

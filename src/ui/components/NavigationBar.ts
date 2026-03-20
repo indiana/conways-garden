@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { LAYOUT } from '../../constants/Layout';
 
 export type NavTab = 'GARDEN' | 'TRADE' | 'ACHIEVEMENTS' | 'ATLAS';
 
@@ -12,7 +13,7 @@ export class NavigationBar extends Phaser.GameObjects.Container {
         this.onTabSwitch = onTabSwitch;
 
         const spacing = 170;
-        const startX = 360 - (spacing * 1.5);
+        const startX = LAYOUT.CENTER_X - (spacing * 1.5);
 
         this.navButtons.GARDEN = this.createNavButton(startX, 0, 'btn_garden', 'GARDEN');
         this.navButtons.TRADE = this.createNavButton(startX + spacing, 0, 'btn_trade', 'TRADE');

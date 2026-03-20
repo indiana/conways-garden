@@ -3,6 +3,7 @@ import { GameStateManager } from '../managers/GameStateManager';
 import { GridSystem } from '../systems/GridSystem';
 import { Events } from '../constants/Events';
 import { GridRenderer } from '../ui/components/GridRenderer';
+import { GameActions } from '../actions/GameActions';
 
 export class MainScene extends Phaser.Scene {
     private gridSystem!: GridSystem;
@@ -18,12 +19,8 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
-        // Initialize Managers
+        // Managers are initialized in PreloadScene
         this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
-        if (!this.gameStateManager) {
-             this.gameStateManager = new GameStateManager();
-             this.registry.set('gameStateManager', this.gameStateManager);
-        }
 
         this.gridSystem = new GridSystem(this.gameStateManager.gridSize);
         this.gridRenderer = new GridRenderer(this);
@@ -74,16 +71,9 @@ export class MainScene extends Phaser.Scene {
         const occupiedId = this.gridSystem.getCell(x, y);
         
         if (!occupiedId) {
-            // Plant
-            const count = this.gameStateManager.getItemCount(selectedItem);
-            if (count > 0) {
-                this.gridSystem.setCell(x, y, selectedItem);
-                this.gameStateManager.removeItem(selectedItem, 1);
-            }
+            GameActions.plant(this.gameStateManager, this.gridSystem, x, y, selectedItem);
         } else {
-            // Harvest
-            this.gridSystem.setCell(x, y, null);
-            this.gameStateManager.addItem(occupiedId, 1);
+            GameActions.harvest(this.gameStateManager, this.gridSystem, x, y);
         }
     }
 

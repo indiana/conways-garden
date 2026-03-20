@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { GameStateManager } from "../managers/GameStateManager";
+import { LocaleManager } from "../managers/LocaleManager";
 import { Events } from "../constants/Events";
 import { MainScene } from "./MainScene";
 import { NavigationBar } from "../ui/components/NavigationBar";
@@ -8,6 +9,7 @@ import { TopBar } from "../ui/components/TopBar";
 import { MenuOverlay } from "../ui/components/MenuOverlay";
 import { InventoryList } from "../ui/components/InventoryList";
 import { RadialTimer } from "../ui/components/RadialTimer";
+import { LAYOUT } from "../constants/Layout";
 
 export class UIScene extends Phaser.Scene {
   private topBar!: TopBar;
@@ -18,6 +20,7 @@ export class UIScene extends Phaser.Scene {
 
   private activeTab: NavTab = 'GARDEN';
   private gameStateManager!: GameStateManager;
+  private localeManager!: LocaleManager;
 
   constructor() {
     super("UIScene");
@@ -25,16 +28,17 @@ export class UIScene extends Phaser.Scene {
 
   create() {
     this.gameStateManager = this.registry.get("gameStateManager") as GameStateManager;
+    this.localeManager = this.registry.get("localeManager") as LocaleManager;
 
     // 1. Top Bar (Gold + Hamburger)
     this.topBar = new TopBar(this, () => this.menuOverlay.toggle());
     this.topBar.updateGold(this.gameStateManager.gold);
 
     // 2. Navigation Bar
-    this.navBar = new NavigationBar(this, 1280 - 100, (tab) => this.switchTab(tab));
+    this.navBar = new NavigationBar(this, LAYOUT.NAV_BAR_Y, (tab) => this.switchTab(tab));
 
     // 3. Menu Overlay
-    this.menuOverlay = new MenuOverlay(this, () => {
+    this.menuOverlay = new MenuOverlay(this, this.localeManager, () => {
         this.gameStateManager.reset();
         this.navBar.setActiveTab('GARDEN');
         this.switchTab('GARDEN');

@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { GameStateManager } from '../managers/GameStateManager';
+import { LocaleManager } from '../managers/LocaleManager';
 
 export class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -6,9 +8,16 @@ export class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
+        // Initialize Managers and store in registry
+        if (!this.registry.get('gameStateManager')) {
+            this.registry.set('gameStateManager', new GameStateManager());
+        }
+        if (!this.registry.get('localeManager')) {
+            this.registry.set('localeManager', new LocaleManager());
+        }
+
         this.load.path = 'assets/';
         this.load.image('tile_ground', 'tile_ground128.png');
-        // this.load.image('plant_sprite', 'tile_turnip128.png'); // Deprecated
         this.load.image('tile_turnip', 'tile_turnip128.png');
         this.load.image('tile_grass', 'tile_grass128.png');
         

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { STYLES } from '../../constants/Styles';
+import { LAYOUT } from '../../constants/Layout';
 
 export class TopBar extends Phaser.GameObjects.Container {
     private goldText: Phaser.GameObjects.Text;
@@ -11,13 +12,14 @@ export class TopBar extends Phaser.GameObjects.Container {
         this.onMenuClick = onMenuClick;
 
         // Gold Display
-        this.goldText = scene.add.text(40, 40, "0", STYLES.GOLD).setOrigin(0, 0.5);
-        this.goldIcon = scene.add.sprite(0, 40, "ui_gold").setOrigin(0, 0.5);
+        const y = LAYOUT.TOP_BAR_Y;
+        this.goldText = scene.add.text(40, y, "0", STYLES.GOLD).setOrigin(0, 0.5);
+        this.goldIcon = scene.add.sprite(0, y, "ui_gold").setOrigin(0, 0.5);
         this.goldIcon.setScale(75 / this.goldIcon.width);
 
         // Hamburger Icon
-        const menuX = 680;
-        const menuY = 40;
+        const menuX = LAYOUT.WIDTH - 40;
+        const menuY = y;
         const menuSize = 40;
         const menuGraphics = scene.add.graphics();
         menuGraphics.lineStyle(4, 0xffffff);

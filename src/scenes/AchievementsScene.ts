@@ -2,9 +2,12 @@ import Phaser from 'phaser';
 import { STYLES } from '../constants/Styles';
 import { ACHIEVEMENTS } from '../types';
 import { GameStateManager } from '../managers/GameStateManager';
+import { LocaleManager } from '../managers/LocaleManager';
+import { LAYOUT } from '../constants/Layout';
 
 export class AchievementsScene extends Phaser.Scene {
     private gameStateManager!: GameStateManager;
+    private localeManager!: LocaleManager;
     private uiContainer!: Phaser.GameObjects.Container;
 
     constructor() {
@@ -13,13 +16,14 @@ export class AchievementsScene extends Phaser.Scene {
 
     create() {
         this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
+        this.localeManager = this.registry.get('localeManager') as LocaleManager;
 
         // Fullscreen background overlay
-        this.add.rectangle(360, 640, 720, 1280, 0x2d3436, 1)
+        this.add.rectangle(LAYOUT.CENTER_X, LAYOUT.CENTER_Y, LAYOUT.WIDTH, LAYOUT.HEIGHT, 0x2d3436, 1)
             .setInteractive(); // Block input
 
         // Title
-        this.add.text(360, 150, 'OSIĄGNIĘCIA', STYLES.TITLE).setOrigin(0.5);
+        this.add.text(LAYOUT.CENTER_X, LAYOUT.ACHIEVEMENTS_TITLE_Y, this.localeManager.get('TAB_ACHIEVEMENTS'), STYLES.TITLE).setOrigin(0.5);
 
         this.uiContainer = this.add.container(0, 0);
         this.renderAchievements();
@@ -30,7 +34,7 @@ export class AchievementsScene extends Phaser.Scene {
     private renderAchievements() {
         this.uiContainer.removeAll(true);
         
-        let currentY = 300;
+        let currentY = LAYOUT.ACHIEVEMENTS_LIST_START_Y;
         const achievementsList = Object.values(ACHIEVEMENTS);
 
         achievementsList.forEach(ach => {
@@ -38,12 +42,11 @@ export class AchievementsScene extends Phaser.Scene {
             const iconKey = isUnlocked ? 'badge_collected' : 'badge_uncollected';
             const textColor = isUnlocked ? '#ffffff' : '#7f8c8d';
 
-            // Moved container to the left (e.g. 50 instead of 360)
             const container = this.add.container(50, currentY);
 
             // Line 1: [Icon] Title [Check]
-            const icon = this.add.sprite(0, 0, iconKey).setScale(1); // Scaled appropriately
-            const title = this.add.text(60, 0, ach.title.toUpperCase(), {
+            const icon = this.add.sprite(0, 0, iconKey).setScale(1); 
+            const title = this.add.text(60, 0, this.localeManager.get(ach.titleKey).toUpperCase(), {
                 fontFamily: 'Fredoka',
                 fontSize: '32px',
                 fontStyle: 'bold',
@@ -57,7 +60,7 @@ export class AchievementsScene extends Phaser.Scene {
             }
 
             // Line 2: Description
-            const desc = this.add.text(60, 40, ach.description, {
+            const desc = this.add.text(60, 40, this.localeManager.get(ach.descriptionKey), {
                 fontFamily: 'Fredoka',
                 fontSize: '24px',
                 fontStyle: 'italic',
@@ -66,14 +69,14 @@ export class AchievementsScene extends Phaser.Scene {
             }).setOrigin(0, 0);
 
             // Line 3: Bonus
-            const bonusLabel = this.add.text(60, desc.y + desc.displayHeight + 10, 'ODBLOKOWUJE: ', {
+            const bonusLabel = this.add.text(60, desc.y + desc.displayHeight + 10, this.localeManager.get('ACHIEVEMENT_UNLOCKS'), {
                 fontFamily: 'Fredoka',
                 fontSize: '24px',
                 fontStyle: 'bold',
                 color: isUnlocked ? '#f1c40f' : '#7f8c8d'
             }).setOrigin(0, 0);
             
-            const bonusValue = this.add.text(bonusLabel.x + bonusLabel.width, bonusLabel.y, ach.rewardDescription, {
+            const bonusValue = this.add.text(bonusLabel.x + bonusLabel.width, bonusLabel.y, this.localeManager.get(ach.rewardDescriptionKey), {
                 fontFamily: 'Fredoka',
                 fontSize: '24px',
                 color: isUnlocked ? '#f1c40f' : '#7f8c8d'
@@ -82,7 +85,7 @@ export class AchievementsScene extends Phaser.Scene {
             container.add([...line1Elements, desc, bonusLabel, bonusValue]);
             this.uiContainer.add(container);
 
-            currentY += 200;
+            currentY += LAYOUT.ACHIEVEMENTS_ITEM_SPACING;
         });
     }
 }
