@@ -13,6 +13,9 @@ export interface Item {
     type: ItemType;
     buyPrice: number;
     icon: string;
+    descriptionKey: string;
+    rulesKey: string;
+    unlockKey: string;
 }
 
 export interface Achievement {
@@ -45,14 +48,20 @@ export const ITEMS: Record<string, Item> = {
         displayNameKey: 'ITEM_TURNIP',
         type: ItemType.Plant,
         buyPrice: 10,
-        icon: 'ui_turnip'
+        icon: 'ui_turnip',
+        descriptionKey: 'ITEM_TURNIP_DESC',
+        rulesKey: 'ITEM_TURNIP_RULES',
+        unlockKey: 'ITEM_UNLOCK_DEFAULT'
     },
     'grass_01': {
         id: 'grass_01',
         displayNameKey: 'ITEM_GRASS',
         type: ItemType.Plant,
         buyPrice: 4,
-        icon: 'ui_grass'
+        icon: 'ui_grass',
+        descriptionKey: 'ITEM_GRASS_DESC',
+        rulesKey: 'ITEM_GRASS_RULES',
+        unlockKey: 'ITEM_UNLOCK_DEFAULT'
     }
 };
 

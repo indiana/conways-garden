@@ -23,7 +23,12 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
         'TRADE_SELL': 'SPRZEDAŻ',
         'TRADE_PRICE': 'Cena: ',
         'TRADE_EMPTY_SELL': 'Brak przedmiotów na sprzedaż',
-        'ACHIEVEMENT_UNLOCKS': 'ODBLOKOWUJE: '
+        'ACHIEVEMENT_UNLOCKS': 'ODBLOKOWUJE: ',
+        'ITEM_TURNIP_DESC': 'Skromne warzywo korzeniowe. Wytrzymałe i niezawodne.',
+        'ITEM_TURNIP_RULES': 'Narodziny: 3 sąsiadów.\nPrzetrwanie: 2-3 sąsiadów.\nŚmierć: < 2 lub > 3 sąsiadów.',
+        'ITEM_UNLOCK_DEFAULT': 'Zawsze dostępne',
+        'ITEM_GRASS_DESC': 'Dzika trawa, która łatwo się rozprzestrzenia. Świetna do wypełniania przestrzeni.',
+        'ITEM_GRASS_RULES': 'Narodziny: 3 sąsiadów.\nPrzetrwanie: 1-3 sąsiadów.\nŚmierć: 0 lub > 3 sąsiadów.'
     },
     EN: {
         'ITEM_TURNIP': 'Turnip',
@@ -44,7 +49,12 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
         'TRADE_SELL': 'SELL',
         'TRADE_PRICE': 'Price: ',
         'TRADE_EMPTY_SELL': 'No items to sell',
-        'ACHIEVEMENT_UNLOCKS': 'UNLOCKS: '
+        'ACHIEVEMENT_UNLOCKS': 'UNLOCKS: ',
+        'ITEM_TURNIP_DESC': 'A humble root vegetable. Sturdy and reliable.',
+        'ITEM_TURNIP_RULES': 'Birth: 3 neighbors.\nSurvival: 2-3 neighbors.\nDeath: < 2 or > 3 neighbors.',
+        'ITEM_UNLOCK_DEFAULT': 'Always Available',
+        'ITEM_GRASS_DESC': 'Wild grass that spreads easily. Great for filling space.',
+        'ITEM_GRASS_RULES': 'Birth: 3 neighbors.\nSurvival: 1-3 neighbors.\nDeath: 0 or > 3 neighbors.'
     }
 };
 
