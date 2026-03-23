@@ -41,6 +41,7 @@ export class MainScene extends Phaser.Scene {
             const oldSize = this.gridSystem.currentSize;
             this.gridSystem.resize(newSize);
             this.gridRenderer.drawGrid(newSize, true, oldSize);
+            this.gridRenderer.updateVisuals(this.gridSystem);
         });
 
         this.gameStateManager.on(Events.GAME_RESET, () => {

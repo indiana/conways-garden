@@ -67,6 +67,7 @@ export class TradeScene extends Phaser.Scene {
     this.gameStateManager.subscribeGold(() => this.refresh());
     this.gameStateManager.subscribeInventory(() => this.refresh());
     this.gameStateManager.subscribeAchievements(() => this.refresh());
+    this.gameStateManager.subscribeUpgrades(() => this.refresh());
     this.localeManager.subscribeLocale(() => this.refresh());
 
     // Listen for wake event to reset view
@@ -201,14 +202,16 @@ export class TradeScene extends Phaser.Scene {
       })
       .setOrigin(0, 0);
 
+    const priceY = nameText.y + nameText.displayHeight + 5;
+
     const priceLabel = this.add
-      .text(180, y + 25, this.localeManager.get("TRADE_PRICE"), STYLES.PRICE)
-      .setOrigin(0, 0.5);
+      .text(180, priceY, this.localeManager.get("TRADE_PRICE"), STYLES.PRICE)
+      .setOrigin(0, 0);
     const priceValue = this.add
-      .text(priceLabel.x + priceLabel.width, y + 25, `${price}`, STYLES.PRICE)
-      .setOrigin(0, 0.5);
+      .text(priceLabel.x + priceLabel.width, priceY, `${price}`, STYLES.PRICE)
+      .setOrigin(0, 0);
     const priceIcon = this.add
-      .sprite(priceValue.x + priceValue.width + 0, y + 25, "ui_gold")
+      .sprite(priceValue.x + priceValue.width + 0, priceY + 12, "ui_gold")
       .setOrigin(0, 0.5);
     priceIcon.setScale(50 / priceIcon.width);
 
@@ -276,24 +279,26 @@ export class TradeScene extends Phaser.Scene {
         })
         .setOrigin(0, 0);
 
+      const priceY = nameText.y + nameText.displayHeight + 5;
+
       const priceLabel = this.add
         .text(
           180,
-          currentY + 25,
+          priceY,
           this.localeManager.get("TRADE_PRICE"),
           STYLES.PRICE,
         )
-        .setOrigin(0, 0.5);
+        .setOrigin(0, 0);
       const priceValue = this.add
         .text(
           priceLabel.x + priceLabel.width,
-          currentY + 25,
+          priceY,
           `${sellPrice}`,
           STYLES.PRICE,
         )
-        .setOrigin(0, 0.5);
+        .setOrigin(0, 0);
       const priceIcon = this.add
-        .sprite(priceValue.x + priceValue.width + 0, currentY + 25, "ui_gold")
+        .sprite(priceValue.x + priceValue.width + 0, priceY + 12, "ui_gold")
         .setOrigin(0, 0.5);
       priceIcon.setScale(50 / priceIcon.width);
 

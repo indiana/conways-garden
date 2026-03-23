@@ -36,6 +36,7 @@ export interface Upgrade {
 
 export interface GameState {
     gold: number;
+    totalGoldEarned: number;
     inventory: Record<string, number>;
     achievements: string[];
     upgrades: string[];
@@ -70,28 +71,57 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
         id: 'first_steps',
         titleKey: 'ACHIEVEMENT_FIRST_STEPS_TITLE',
         descriptionKey: 'ACHIEVEMENT_FIRST_STEPS_DESC',
+        rewardDescriptionKey: 'ACHIEVEMENT_REWARD_4X4',
+        icon: 'button_achievements'
+    },
+    'golden_hand': {
+        id: 'golden_hand',
+        titleKey: 'ACHIEVEMENT_GOLDEN_HAND_TITLE',
+        descriptionKey: 'ACHIEVEMENT_GOLDEN_HAND_DESC',
         rewardDescriptionKey: 'ACHIEVEMENT_REWARD_5X5',
+        icon: 'button_achievements'
+    },
+    'green_investor': {
+        id: 'green_investor',
+        titleKey: 'ACHIEVEMENT_GREEN_INVESTOR_TITLE',
+        descriptionKey: 'ACHIEVEMENT_GREEN_INVESTOR_DESC',
+        rewardDescriptionKey: 'ACHIEVEMENT_REWARD_SOON',
+        icon: 'button_achievements'
+    },
+    'flora_tycoon': {
+        id: 'flora_tycoon',
+        titleKey: 'ACHIEVEMENT_FLORA_TYCOON_TITLE',
+        descriptionKey: 'ACHIEVEMENT_FLORA_TYCOON_DESC',
+        rewardDescriptionKey: 'ACHIEVEMENT_REWARD_SOON',
         icon: 'button_achievements'
     }
 };
 
 export const UPGRADES: Record<string, Upgrade> = {
-    'grid_5x5': {
-        id: 'grid_5x5',
-        displayNameKey: 'UPGRADE_GRID_5X5',
-        cost: 100,
-        descriptionKey: 'UPGRADE_GRID_5X5_DESC',
+    'garden_level_2': {
+        id: 'garden_level_2',
+        displayNameKey: 'UPGRADE_GARDEN_LEVEL_2',
+        cost: 50,
+        descriptionKey: 'UPGRADE_GARDEN_LEVEL_2_DESC',
         requirementAchievementId: 'first_steps'
+    },
+    'garden_level_3': {
+        id: 'garden_level_3',
+        displayNameKey: 'UPGRADE_GARDEN_LEVEL_3',
+        cost: 250,
+        descriptionKey: 'UPGRADE_GARDEN_LEVEL_3_DESC',
+        requirementAchievementId: 'golden_hand'
     }
 };
 
 export const INITIAL_STATE: GameState = {
     gold: 20,
+    totalGoldEarned: 0,
     inventory: {
         'turnip': 5,
         'grass_01': 5
     },
     achievements: [],
     upgrades: [],
-    gridSize: 4
+    gridSize: 3
 };

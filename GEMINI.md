@@ -3,7 +3,7 @@
 A sandbox logic/simulation game combining inventory management with Conway's Game of Life rules, built with **Phaser 3**, **TypeScript**, and **Vite**.
 
 ## 🎯 Project Purpose
-Players manage a 4x4 isometric garden grid. Every 10 seconds (the "Pulse"), the grid evolves according to Conway's Game of Life rules. Players can plant seeds (consuming inventory) and harvest plants (gaining inventory) to maintain the ecosystem and participate in a simple economy.
+Players manage an isometric garden grid. Every 10 seconds (the "Pulse"), the grid evolves according to Conway's Game of Life rules. Players can plant seeds (consuming inventory) and harvest plants (gaining inventory) to maintain the ecosystem and participate in a simple economy.
 
 ## 🛠 Tech Stack
 - **Engine**: Phaser 3
@@ -21,7 +21,7 @@ Players manage a 4x4 isometric garden grid. Every 10 seconds (the "Pulse"), the 
 
 ### Key Components
 - **`GameStateManager`**: Centralized state management for Gold and Inventory (Turnips). Emits events when state changes.
-- **`GridSystem`**: Pure logic class for the 4x4 grid. Implements Conway's Game of Life evolution and neighbor calculations.
+- **`GridSystem`**: Pure logic class for the grid. Implements Conway's Game of Life evolution and neighbor calculations.
 - **`Events`**: Constant definitions for cross-scene communication (e.g., `GOLD_CHANGED`, `INVENTORY_CHANGED`, `PULSE_PROGRESS`).
 
 ## 🚀 Building and Running

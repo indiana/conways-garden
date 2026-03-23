@@ -2,14 +2,17 @@ import Phaser from 'phaser';
 import type { GameState } from '../types';
 import { INITIAL_STATE, UPGRADES } from '../types';
 import { Events } from '../constants/Events';
+import { AchievementsManager } from './AchievementsManager';
 
 export class GameStateManager extends Phaser.Events.EventEmitter {
     private state: GameState;
     private _selectedItem: string = 'turnip';
+    private achievementsManager: AchievementsManager;
 
     constructor() {
         super();
         this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+        this.achievementsManager = new AchievementsManager();
     }
 
     public get selectedItem(): string {
@@ -34,6 +37,7 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
 
     public addGold(amount: number) {
         this.state.gold += amount;
+        this.state.totalGoldEarned += amount;
         this.emit(Events.GOLD_CHANGED, this.state.gold);
         this.checkAchievements();
     }
@@ -88,12 +92,18 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
         if (!upgrade) return false;
         if (this.hasUpgrade(id)) return false;
 
+        if (upgrade.requirementAchievementId && !this.hasAchievement(upgrade.requirementAchievementId)) {
+             return false;
+        }
+
         if (this.spendGold(upgrade.cost)) {
             this.state.upgrades.push(id);
             this.emit(Events.UPGRADE_PURCHASED, id);
             
             // Apply Upgrade Effects
-            if (id === 'grid_5x5') {
+            if (id === 'garden_level_2') {
+                this.expandGrid(4);
+            } else if (id === 'garden_level_3') {
                 this.expandGrid(5);
             }
             
@@ -108,10 +118,8 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
     }
 
     private checkAchievements() {
-        // Monitor: First Steps (Collect 200 gold)
-        if (this.state.gold >= 200 && !this.hasAchievement('first_steps')) {
-            this.unlockAchievement('first_steps');
-        }
+        const newAchievements = this.achievementsManager.check(this.state);
+        newAchievements.forEach(id => this.unlockAchievement(id));
     }
 
     public reset() {
