@@ -11,11 +11,14 @@ import { InventoryList } from "../ui/components/InventoryList";
 import { RadialTimer } from "../ui/components/RadialTimer";
 import { LAYOUT } from "../constants/Layout";
 
+import { AchievementPopup } from "../ui/components/AchievementPopup";
+
 export class UIScene extends Phaser.Scene {
   private navBar!: NavigationBar;
   private menuOverlay!: MenuOverlay;
   private inventoryList!: InventoryList;
   private radialTimer!: RadialTimer;
+  private achievementPopup!: AchievementPopup;
 
   private activeTab: NavTab = 'GARDEN';
   private gameStateManager!: GameStateManager;
@@ -47,6 +50,17 @@ export class UIScene extends Phaser.Scene {
 
     // 5. Radial Timer
     this.radialTimer = new RadialTimer(this);
+
+    // 6. Achievement Popup
+    this.achievementPopup = new AchievementPopup(this, this.localeManager, () => {
+        this.navBar.setActiveTab('ACHIEVEMENTS');
+        this.switchTab('ACHIEVEMENTS');
+    });
+
+    // Listen for Achievement Unlock
+    this.gameStateManager.on(Events.ACHIEVEMENT_UNLOCKED, (id: string) => {
+        this.achievementPopup.show(id);
+    });
 
     const mainScene = this.scene.get("MainScene") as MainScene;
     if (mainScene) {
