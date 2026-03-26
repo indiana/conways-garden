@@ -65,8 +65,43 @@ export class AtlasScene extends Phaser.Scene {
             priceIcon.setScale(40 / priceIcon.width);
             this.container.add([priceLabel, priceValue, priceIcon]);
 
+            // 3.5 Tags
+            const tagColors: Record<string, number> = {
+                'vegetable': 0x27ae60,
+                'wild': 0xe67e22,
+                'mushroom': 0x9b59b6
+            };
+            const tagBgColor = 0x2d3436;
+            const tagBorderColor = 0x636e72;
+            let tagX = 150;
+            const tagY = currentY + 90;
+
+            plant.tags.forEach(tag => {
+                const tagText = this.localeManager.get(`TAG_${tag.toUpperCase()}`);
+                const padding = 12;
+                const textStyle = {
+                    fontFamily: 'Comfortaa, sans-serif',
+                    fontSize: '16px',
+                    color: '#ffffff'
+                };
+                const tempText = this.add.text(0, 0, tagText, textStyle);
+                const tagWidth = tempText.width + padding * 2;
+                const tagHeight = tempText.height + 6;
+                tempText.destroy();
+
+                const bg = this.add.graphics();
+                bg.fillStyle(tagBgColor, 1);
+                bg.fillRoundedRect(tagX, tagY - tagHeight / 2, tagWidth, tagHeight, 8);
+                bg.lineStyle(2, tagColors[tag] || tagBorderColor, 1);
+                bg.strokeRoundedRect(tagX, tagY - tagHeight / 2, tagWidth, tagHeight, 8);
+
+                const text = this.add.text(tagX + padding, tagY, tagText, textStyle).setOrigin(0, 0.5);
+                this.container.add([bg, text]);
+                tagX += tagWidth + 10;
+            });
+
             // 4. Description (Flavor)
-            currentY += 90;
+            currentY += 130;
             const descText = this.add.text(40, currentY, this.localeManager.get(plant.descriptionKey), {
                 fontFamily: 'Monospace',
                 fontSize: '20px',

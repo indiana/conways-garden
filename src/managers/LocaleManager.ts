@@ -48,6 +48,9 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
       "Narodziny: 3 sąsiadów.\nPrzetrwanie: 1-3 sąsiadów.\nŚmierć: 0 lub > 3 sąsiadów.",
     ATLAS_RULES: "ZASADY:",
     ATLAS_UNLOCK: "ODBLOKOWANIE:",
+    TAG_VEGETABLE: "Warzywo",
+    TAG_WILD: "Dzikie",
+    TAG_MUSHROOM: "Grzyb",
   },
   EN: {
     ITEM_TURNIP: "Turnip",
@@ -92,6 +95,9 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
       "Birth: 3 neighbors.\nSurvival: 1-3 neighbors.\nDeath: 0 or > 3 neighbors.",
     ATLAS_RULES: "RULES:",
     ATLAS_UNLOCK: "UNLOCK:",
+    TAG_VEGETABLE: "Vegetable",
+    TAG_WILD: "Wild",
+    TAG_MUSHROOM: "Mushroom",
   },
 };
 

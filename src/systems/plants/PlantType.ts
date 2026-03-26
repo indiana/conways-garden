@@ -3,5 +3,6 @@ export interface PlantType {
     buyPrice: number;
     sellPrice: number;
     asset: string;
+    tags: string[];
     shouldSurvive(neighborCount: number): boolean;
 }

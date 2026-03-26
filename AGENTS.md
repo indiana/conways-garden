@@ -118,12 +118,14 @@ To add a new plant species, you must update **4 files**:
 ### 1. Create Plant Class (`src/systems/plants/[PlantName].ts`)
 ```typescript
 import type { PlantType } from './PlantType';
+import { PlantTags } from './PlantTags';
 
 export class [PlantName] implements PlantType {
     id = '[plant_id]';
     buyPrice = [cost];
     sellPrice = [cost / 2];
     asset = '[sprite_key]';
+    tags = [[PlantTags.VEGETABLE, PlantTags.WILD, PlantTags.MUSHROOM]];  // Assign tags
 
     shouldSurvive(neighborCount: number): boolean {
         return neighborCount >= [min_survival] && neighborCount <= [max_survival];
@@ -156,7 +158,8 @@ export const ITEMS: Record<string, Item> = {
         icon: 'ui_[icon_key]',
         descriptionKey: 'ITEM_[PLANT_ID_UPPER]_DESC',
         rulesKey: 'ITEM_[PLANT_ID_UPPER]_RULES',
-        unlockKey: 'ITEM_UNLOCK_DEFAULT'  // or achievement ID
+        unlockKey: 'ITEM_UNLOCK_DEFAULT',  // or achievement ID
+        tags: [[PlantTags.VEGETABLE, PlantTags.WILD, PlantTags.MUSHROOM]]  // Assign tags
     }
 };
 ```
@@ -187,5 +190,13 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
 | `sellPrice` | Sale price (typically `buyPrice / 2`) |
 | `asset` | Sprite key for in-game tile (e.g., `'tile_turnip'`) |
 | `icon` | Sprite key for UI icon (e.g., `'ui_turnip'`) |
+| `tags` | Array of tags from PlantTags (e.g., `[PlantTags.VEGETABLE]`) |
 | `shouldSurvive` | Returns `true` if plant survives with given neighbor count |
 | `unlockKey` | Use `'ITEM_UNLOCK_DEFAULT'` for always available, or an achievement ID |
+
+### Available Tags
+| Tag | Color | Description |
+|-----|-------|-------------|
+| `PlantTags.VEGETABLE` | Green (#27ae60) | Root vegetables, leafy greens |
+| `PlantTags.WILD` | Orange (#e67e22) | Wild/foraging plants |
+| `PlantTags.MUSHROOM` | Purple (#9b59b6) | Fungi species |

@@ -16,6 +16,7 @@ export interface Item {
     descriptionKey: string;
     rulesKey: string;
     unlockKey: string;
+    tags: string[];
 }
 
 export interface Achievement {
@@ -52,7 +53,8 @@ export const ITEMS: Record<string, Item> = {
         icon: 'ui_turnip',
         descriptionKey: 'ITEM_TURNIP_DESC',
         rulesKey: 'ITEM_TURNIP_RULES',
-        unlockKey: 'ITEM_UNLOCK_DEFAULT'
+        unlockKey: 'ITEM_UNLOCK_DEFAULT',
+        tags: ['vegetable']
     },
     'grass_01': {
         id: 'grass_01',
@@ -62,7 +64,8 @@ export const ITEMS: Record<string, Item> = {
         icon: 'ui_grass',
         descriptionKey: 'ITEM_GRASS_DESC',
         rulesKey: 'ITEM_GRASS_RULES',
-        unlockKey: 'ITEM_UNLOCK_DEFAULT'
+        unlockKey: 'ITEM_UNLOCK_DEFAULT',
+        tags: ['wild']
     }
 };
 
