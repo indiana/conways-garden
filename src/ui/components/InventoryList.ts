@@ -25,6 +25,7 @@ export class InventoryList extends Phaser.GameObjects.Container {
     const items = [
       { id: "turnip", icon: "ui_turnip" },
       { id: "grass_01", icon: "ui_grass" },
+      { id: "mushroom_01", icon: "ui_mushroom_01" },
     ];
 
     items.forEach((item, index) => {
@@ -75,14 +76,19 @@ export class InventoryList extends Phaser.GameObjects.Container {
     if (this.countTexts["grass_01"]) {
       this.countTexts["grass_01"].setText(`x${inventory["grass_01"] || 0}`);
     }
+    if (this.countTexts["mushroom_01"]) {
+      this.countTexts["mushroom_01"].setText(`x${inventory["mushroom_01"] || 0}`);
+    }
   }
+
+  private itemOrder: string[] = ["turnip", "grass_01", "mushroom_01"];
 
   public updateSelectionHighlight() {
     const selectedItem = this.gameStateManager.selectedItem;
 
     Object.keys(this.selectionFrames).forEach((itemId) => {
       const frame = this.selectionFrames[itemId];
-      const index = itemId === "turnip" ? 0 : 1;
+      const index = this.itemOrder.indexOf(itemId);
       const x = LAYOUT.INVENTORY_LIST_X - 10;
       const y =
         LAYOUT.INVENTORY_LIST_START_Y + index * LAYOUT.INVENTORY_ITEM_SPACING;
@@ -93,9 +99,9 @@ export class InventoryList extends Phaser.GameObjects.Container {
         frame.lineStyle(4, 0x7f8c8d, 1);
         frame.strokeRoundedRect(
           x,
-          y - LAYOUT.INVENTORY_SLOT_HEIGHT / 2,
+          y - LAYOUT.INVENTORY_ITEM_SPACING / 2,
           LAYOUT.INVENTORY_SLOT_WIDTH,
-          LAYOUT.INVENTORY_SLOT_HEIGHT,
+          LAYOUT.INVENTORY_ITEM_SPACING,
           15,
         );
       }

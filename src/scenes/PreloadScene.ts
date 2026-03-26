@@ -20,9 +20,11 @@ export class PreloadScene extends Phaser.Scene {
         this.load.image('tile_ground', 'tile_ground128.png');
         this.load.image('tile_turnip', 'tile_turnip128.png');
         this.load.image('tile_grass', 'tile_grass128.png');
+        this.load.image('tile_mushroom_01', 'tile_mushroom_butterfly128.png');
         
         this.load.image('ui_turnip', 'plain_turnip60.png');
         this.load.image('ui_grass', 'plain_grass60.png');
+        this.load.image('ui_mushroom_01', 'plain_mushroom_butterfly60.png');
         this.load.image('ui_gold', 'icon_coin.png');
         
         // Navigation Buttons

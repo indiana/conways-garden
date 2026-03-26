@@ -8,7 +8,7 @@ export class Grass implements PlantType {
     asset = 'tile_grass';
     tags = [PlantTags.WILD];
 
-    shouldSurvive(neighborCount: number): boolean {
+    shouldSurvive(neighborCount: number, _nonMushroomCount?: number): boolean {
         return neighborCount >= 1 && neighborCount <= 3;
     }
 }

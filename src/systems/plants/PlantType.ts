@@ -4,5 +4,5 @@ export interface PlantType {
     sellPrice: number;
     asset: string;
     tags: string[];
-    shouldSurvive(neighborCount: number): boolean;
+    shouldSurvive(neighborCount: number, nonMushroomCount?: number): boolean;
 }

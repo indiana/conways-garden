@@ -67,7 +67,7 @@ export class GridSystem extends Phaser.Events.EventEmitter {
         for (let x = 0; x < this.size; x++) {
             nextGrid[x] = [];
             for (let y = 0; y < this.size; y++) {
-                const neighbors = this.getNeighbors(x, y);
+                const neighborInfo = this.getNeighborInfo(x, y);
                 const currentPlantId = this.grid[x][y];
                 let nextState: string | null = null;
 
@@ -75,7 +75,7 @@ export class GridSystem extends Phaser.Events.EventEmitter {
                     // Survival Logic
                     const plantType = PlantFactory.getPlant(currentPlantId);
                     if (plantType) {
-                        const shouldSurvive = plantType.shouldSurvive(neighbors.length);
+                        const shouldSurvive = plantType.shouldSurvive(neighborInfo.count, neighborInfo.nonMushroomCount);
                         if (shouldSurvive) {
                             nextState = currentPlantId;
                         } else {
@@ -87,8 +87,8 @@ export class GridSystem extends Phaser.Events.EventEmitter {
                     }
                 } else {
                     // Birth Logic
-                    if (neighbors.length === 3) {
-                        nextState = HybridSystem.resolveBirth(neighbors);
+                    if (neighborInfo.count === 3) {
+                        nextState = HybridSystem.resolveBirth(neighborInfo.neighborIds, neighborInfo.nonMushroomCount > 0);
                     } else {
                         nextState = null;
                     }
@@ -105,8 +105,9 @@ export class GridSystem extends Phaser.Events.EventEmitter {
         }
     }
 
-    private getNeighbors(cx: number, cy: number): string[] {
-        const neighbors: string[] = [];
+    private getNeighborInfo(cx: number, cy: number): { count: number; nonMushroomCount: number; neighborIds: string[] } {
+        const neighborIds: string[] = [];
+        let nonMushroomCount = 0;
         for (let x = -1; x <= 1; x++) {
             for (let y = -1; y <= 1; y++) {
                 if (x === 0 && y === 0) continue;
@@ -114,11 +115,17 @@ export class GridSystem extends Phaser.Events.EventEmitter {
                 const ny = cy + y;
                 if (nx >= 0 && nx < this.size && ny >= 0 && ny < this.size) {
                     const cell = this.grid[nx][ny];
-                    if (cell) neighbors.push(cell);
+                    if (cell) {
+                        neighborIds.push(cell);
+                        const plantType = PlantFactory.getPlant(cell);
+                        if (plantType && !plantType.tags.includes('mushroom')) {
+                            nonMushroomCount++;
+                        }
+                    }
                 }
             }
         }
-        return neighbors;
+        return { count: neighborIds.length, nonMushroomCount, neighborIds };
     }
 
     public reset() {

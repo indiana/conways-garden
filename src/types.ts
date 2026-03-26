@@ -66,6 +66,17 @@ export const ITEMS: Record<string, Item> = {
         rulesKey: 'ITEM_GRASS_RULES',
         unlockKey: 'ITEM_UNLOCK_DEFAULT',
         tags: ['wild']
+    },
+    'mushroom_01': {
+        id: 'mushroom_01',
+        displayNameKey: 'ITEM_MUSHROOM',
+        type: ItemType.Plant,
+        buyPrice: 20,
+        icon: 'ui_mushroom_01',
+        descriptionKey: 'ITEM_MUSHROOM_DESC',
+        rulesKey: 'ITEM_MUSHROOM_RULES',
+        unlockKey: 'ITEM_UNLOCK_DEFAULT',
+        tags: ['mushroom']
     }
 };
 

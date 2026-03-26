@@ -51,6 +51,9 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     TAG_VEGETABLE: "Warzywo",
     TAG_WILD: "Dzikie",
     TAG_MUSHROOM: "Grzyb",
+    ITEM_MUSHROOM: "Maślak",
+    ITEM_MUSHROOM_DESC: "Złocisty grzyb leśny. Preferuje towarzystwo roślin.",
+    ITEM_MUSHROOM_RULES: "Narodziny: 3 sąsiadów (w tym min. 1 nie-grzyb).\nPrzetrwanie: 1-2 sąsiadów (min. 1 nie-grzyb).\nŚmierć: < 1, > 2 lub sami grzyby.",
   },
   EN: {
     ITEM_TURNIP: "Turnip",
@@ -98,6 +101,9 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     TAG_VEGETABLE: "Vegetable",
     TAG_WILD: "Wild",
     TAG_MUSHROOM: "Mushroom",
+    ITEM_MUSHROOM: "Butterfly mushroom",
+    ITEM_MUSHROOM_DESC: "Golden forest mushroom. Prefers the company of plants.",
+    ITEM_MUSHROOM_RULES: "Birth: 3 neighbors (at least 1 non-mushroom).\nSurvival: 1-2 neighbors (at least 1 non-mushroom).\nDeath: < 1, > 2, or all mushrooms.",
   },
 };
 
