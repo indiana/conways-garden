@@ -78,35 +78,35 @@ export class AtlasScene extends Phaser.Scene {
             currentY += descText.height + 20;
 
             // 5. Rules
-            const rulesLabel = this.add.text(40, currentY, 'RULES:', {
+            const rulesLabel = this.add.text(40, currentY, this.localeManager.get('ATLAS_RULES'), {
                 fontFamily: 'Monospace',
                 fontSize: '20px',
                 color: '#e74c3c',
                 fontStyle: 'bold'
             }).setOrigin(0, 0);
             
-            const rulesText = this.add.text(120, currentY, this.localeManager.get(plant.rulesKey), {
+            const rulesText = this.add.text(185, currentY, this.localeManager.get(plant.rulesKey), {
                 fontFamily: 'Monospace',
                 fontSize: '20px',
                 color: '#b2bec3',
-                wordWrap: { width: 560 }
+                wordWrap: { width: 495 }
             }).setOrigin(0, 0);
             this.container.add([rulesLabel, rulesText]);
             currentY += rulesText.height + 20;
 
             // 6. Unlock
-            const unlockLabel = this.add.text(40, currentY, 'UNLOCK:', {
+            const unlockLabel = this.add.text(40, currentY, this.localeManager.get('ATLAS_UNLOCK'), {
                 fontFamily: 'Monospace',
                 fontSize: '20px',
                 color: '#2ecc71',
                 fontStyle: 'bold'
             }).setOrigin(0, 0);
 
-            const unlockText = this.add.text(130, currentY, this.localeManager.get(plant.unlockKey), {
+            const unlockText = this.add.text(185, currentY, this.localeManager.get(plant.unlockKey), {
                 fontFamily: 'Monospace',
                 fontSize: '20px',
                 color: '#b2bec3',
-                wordWrap: { width: 550 }
+                wordWrap: { width: 495 }
             }).setOrigin(0, 0);
             this.container.add([unlockLabel, unlockText]);
             currentY += unlockText.height + 30;
