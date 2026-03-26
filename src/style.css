@@ -5,12 +5,12 @@ html, body {
   overflow: hidden;
   height: 100vh;
   width: 100vw;
-  font-family: 'Fredoka', sans-serif;
+  font-family: 'Comfortaa', sans-serif;
 }
 
 /* Preload font */
 .font-loader {
-    font-family: 'Fredoka';
+    font-family: 'Comfortaa';
     position: absolute;
     left: -9999px;
 }

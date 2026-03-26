@@ -56,7 +56,7 @@ export class AchievementsScene extends Phaser.Scene {
             // Line 1: [Icon] Title [Check]
             const icon = this.add.sprite(0, 0, iconKey).setScale(1); 
             const title = this.add.text(60, 0, this.localeManager.get(ach.titleKey).toUpperCase(), {
-                fontFamily: 'Fredoka',
+                fontFamily: 'Comfortaa',
                 fontSize: '32px',
                 fontStyle: 'bold',
                 color: textColor
@@ -70,7 +70,7 @@ export class AchievementsScene extends Phaser.Scene {
 
             // Line 2: Description
             const desc = this.add.text(60, 40, this.localeManager.get(ach.descriptionKey), {
-                fontFamily: 'Fredoka',
+                fontFamily: 'Comfortaa',
                 fontSize: '24px',
                 fontStyle: 'italic',
                 color: textColor,
@@ -79,14 +79,14 @@ export class AchievementsScene extends Phaser.Scene {
 
             // Line 3: Bonus
             const bonusLabel = this.add.text(60, desc.y + desc.displayHeight + 10, this.localeManager.get('ACHIEVEMENT_UNLOCKS'), {
-                fontFamily: 'Fredoka',
+                fontFamily: 'Comfortaa',
                 fontSize: '24px',
                 fontStyle: 'bold',
                 color: isUnlocked ? '#f1c40f' : '#7f8c8d'
             }).setOrigin(0, 0);
             
             const bonusValue = this.add.text(bonusLabel.x + bonusLabel.width, bonusLabel.y, this.localeManager.get(ach.rewardDescriptionKey), {
-                fontFamily: 'Fredoka',
+                fontFamily: 'Comfortaa',
                 fontSize: '24px',
                 color: isUnlocked ? '#f1c40f' : '#7f8c8d'
             }).setOrigin(0, 0);

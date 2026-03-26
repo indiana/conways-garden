@@ -36,7 +36,7 @@ export class AchievementPopup extends Phaser.GameObjects.Container {
     // Title
     this.title = scene.add
       .text(-180, -25, "", {
-        fontFamily: "Fredoka",
+        fontFamily: "Comfortaa",
         fontSize: "28px",
         fontStyle: "bold",
         color: "#f1c40f",
@@ -46,7 +46,7 @@ export class AchievementPopup extends Phaser.GameObjects.Container {
     // Description
     this.desc = scene.add
       .text(-180, 15, "", {
-        fontFamily: "Fredoka",
+        fontFamily: "Comfortaa",
         fontSize: "18px",
         color: "#ffffff",
         wordWrap: { width: 400 },

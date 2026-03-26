@@ -1,4 +1,4 @@
-export const FONT_FAMILY = "'Fredoka', sans-serif";
+export const FONT_FAMILY = "'Comfortaa', sans-serif";
 
 export const STYLES = {
     GOLD: {
