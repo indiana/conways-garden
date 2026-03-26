@@ -110,3 +110,82 @@ Before completing any task:
 1. Run `npm run build` to verify TypeScript compilation
 2. Fix any type errors or lint issues
 3. Ensure changes follow existing patterns and conventions
+
+## Adding New Plant Species
+
+To add a new plant species, you must update **4 files**:
+
+### 1. Create Plant Class (`src/systems/plants/[PlantName].ts`)
+```typescript
+import type { PlantType } from './PlantType';
+
+export class [PlantName] implements PlantType {
+    id = '[plant_id]';
+    buyPrice = [cost];
+    sellPrice = [cost / 2];
+    asset = '[sprite_key]';
+
+    shouldSurvive(neighborCount: number): boolean {
+        return neighborCount >= [min_survival] && neighborCount <= [max_survival];
+    }
+}
+```
+
+### 2. Register in PlantFactory (`src/systems/plants/PlantFactory.ts`)
+```typescript
+import { [PlantName] } from './[PlantName]';
+
+export class PlantFactory {
+    private static plants: Record<string, PlantType> = {
+        'turnip': new Turnip(),
+        'grass_01': new Grass(),
+        '[plant_id]': new [PlantName]()  // Add this line
+    };
+}
+```
+
+### 3. Add Item Definition (`src/types.ts`)
+```typescript
+export const ITEMS: Record<string, Item> = {
+    // ... existing items ...
+    '[plant_id]': {
+        id: '[plant_id]',
+        displayNameKey: 'ITEM_[PLANT_ID_UPPER]',
+        type: ItemType.Plant,
+        buyPrice: [cost],
+        icon: 'ui_[icon_key]',
+        descriptionKey: 'ITEM_[PLANT_ID_UPPER]_DESC',
+        rulesKey: 'ITEM_[PLANT_ID_UPPER]_RULES',
+        unlockKey: 'ITEM_UNLOCK_DEFAULT'  // or achievement ID
+    }
+};
+```
+
+### 4. Add Translations (`src/managers/LocaleManager.ts`)
+```typescript
+export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
+    PL: {
+        // ... existing translations ...
+        'ITEM_[PLANT_ID_UPPER]': '[Polish Name]',
+        'ITEM_[PLANT_ID_UPPER]_DESC': '[Polish Description]',
+        'ITEM_[PLANT_ID_UPPER]_RULES': 'Narodziny: 3 sąsiadów.\nPrzetrwanie: [min]-[max] sąsiadów.\nŚmierć: < [min] lub > [max] sąsiadów.'
+    },
+    EN: {
+        // ... existing translations ...
+        'ITEM_[PLANT_ID_UPPER]': '[English Name]',
+        'ITEM_[PLANT_ID_UPPER]_DESC': '[English Description]',
+        'ITEM_[PLANT_ID_UPPER]_RULES': 'Birth: 3 neighbors.\nSurvival: [min]-[max] neighbors.\nDeath: < [min] or > [max] neighbors.'
+    }
+};
+```
+
+### Parameters
+| Parameter | Description |
+|-----------|-------------|
+| `id` | Unique identifier (e.g., `'turnip'`, `'grass_01'`) |
+| `buyPrice` | Cost to purchase (e.g., `10`) |
+| `sellPrice` | Sale price (typically `buyPrice / 2`) |
+| `asset` | Sprite key for in-game tile (e.g., `'tile_turnip'`) |
+| `icon` | Sprite key for UI icon (e.g., `'ui_turnip'`) |
+| `shouldSurvive` | Returns `true` if plant survives with given neighbor count |
+| `unlockKey` | Use `'ITEM_UNLOCK_DEFAULT'` for always available, or an achievement ID |
