@@ -24,20 +24,16 @@ export class HybridSystem {
         const roll = Math.random();
         let cumulative = 0;
 
-        if (counts['grass_01']) {
-            const chance = counts['grass_01'] / 3;
-            if (roll < cumulative + chance) return 'grass_01';
-            cumulative += chance;
+        for (const plantId of parents) {
+            if (counts[plantId]) {
+                const chance = counts[plantId] / 3;
+                if (roll >= cumulative && roll < cumulative + chance) {
+                    return plantId;
+                }
+                cumulative += chance;
+            }
         }
-        if (counts['mushroom_01']) {
-            const chance = counts['mushroom_01'] / 3;
-            if (roll < cumulative + chance) return 'mushroom_01';
-            cumulative += chance;
-        }
-        if (counts['turnip']) {
-            const chance = counts['turnip'] / 3;
-            if (roll < cumulative + chance) return 'turnip';
-        }
+
         return 'turnip';
     }
 }

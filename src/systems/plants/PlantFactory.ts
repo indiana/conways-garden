@@ -13,4 +13,8 @@ export class PlantFactory {
     public static getPlant(id: string): PlantType | undefined {
         return this.plants[id];
     }
+
+    public static getAllPlants(): PlantType[] {
+        return Object.values(this.plants);
+    }
 }

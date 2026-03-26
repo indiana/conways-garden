@@ -26,13 +26,14 @@ export const LAYOUT = {
     TRADE_LIST_START_Y: 400,
     TRADE_ITEM_SPACING: 170,
     
+    // Shared Scrollable Panel
+    SCROLL_TOP: 170,
+    SCROLL_BOTTOM: 1080,
+    SCROLL_SPEED: 30,
+
     // Achievements Scene
     ACHIEVEMENTS_TITLE_Y: 120,
-    ACHIEVEMENTS_SCROLL_TOP: 170,
-    ACHIEVEMENTS_SCROLL_BOTTOM: 1080,
 
     // Atlas Scene
-    ATLAS_TITLE_Y: 120,
-    ATLAS_SCROLL_TOP: 170,
-    ATLAS_SCROLL_BOTTOM: 1080
+    ATLAS_TITLE_Y: 120
 };
