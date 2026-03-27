@@ -4,6 +4,7 @@ import { GridSystem } from '../systems/GridSystem';
 import { Events } from '../constants/Events';
 import { GridRenderer } from '../ui/components/GridRenderer';
 import { GameActions } from '../actions/GameActions';
+import { LAYOUT } from '../constants/Layout';
 
 export class MainScene extends Phaser.Scene {
     private gridSystem!: GridSystem;
@@ -21,6 +22,10 @@ export class MainScene extends Phaser.Scene {
     create() {
         // Managers are initialized in PreloadScene
         this.gameStateManager = this.registry.get('gameStateManager') as GameStateManager;
+
+        // Background (always at bottom)
+        const background = this.add.image(LAYOUT.CENTER_X, LAYOUT.CENTER_Y, 'background');
+        background.setDepth(-100);
 
         this.gridSystem = new GridSystem(this.gameStateManager.gridSize);
         this.gridRenderer = new GridRenderer(this);

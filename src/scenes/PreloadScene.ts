@@ -40,6 +40,9 @@ export class PreloadScene extends Phaser.Scene {
         // Achievement Badges
         this.load.image('badge_uncollected', 'badge_achievement_grayed40.png');
         this.load.image('badge_collected', 'badge_achievement_earned40.png');
+
+        // Background
+        this.load.image('background', 'background.png');
     }
 
     create() {

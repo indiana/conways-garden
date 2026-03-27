@@ -18,10 +18,10 @@ export class NavigationBar extends Phaser.GameObjects.Container {
         const spacing = 170;
         const startX = LAYOUT.CENTER_X - (spacing * 1.5);
 
-        this.navButtons.GARDEN = this.createNavButton(startX, 0, 'btn_garden', 'GARDEN');
-        this.navButtons.TRADE = this.createNavButton(startX + spacing, 0, 'btn_trade', 'TRADE');
-        this.navButtons.ACHIEVEMENTS = this.createNavButton(startX + spacing * 2, 0, 'btn_achievements', 'ACHIEVEMENTS');
-        this.navButtons.ATLAS = this.createNavButton(startX + spacing * 3, 0, 'btn_atlas', 'ATLAS');
+        this.navButtons.GARDEN = this.createNavButton(startX, 8, 'btn_garden', 'GARDEN');
+        this.navButtons.TRADE = this.createNavButton(startX + spacing, 8, 'btn_trade', 'TRADE');
+        this.navButtons.ACHIEVEMENTS = this.createNavButton(startX + spacing * 2 + 5, 8, 'btn_achievements', 'ACHIEVEMENTS');
+        this.navButtons.ATLAS = this.createNavButton(startX + spacing * 3 + 7, 8, 'btn_atlas', 'ATLAS');
 
         this.add([
             this.navButtons.GARDEN,
