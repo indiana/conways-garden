@@ -29,17 +29,13 @@ export class TradeScene extends Phaser.Scene {
     ) as GameStateManager;
     this.localeManager = this.registry.get("localeManager") as LocaleManager;
 
-    // Fullscreen background overlay
-    this.add
-      .rectangle(
-        LAYOUT.CENTER_X,
-        LAYOUT.CENTER_Y,
-        LAYOUT.WIDTH,
-        LAYOUT.HEIGHT,
-        0x2d3436,
-        1,
-      )
-      .setInteractive(); // Block input
+    // Background (always at bottom)
+    const background = this.add.image(
+      LAYOUT.CENTER_X,
+      LAYOUT.CENTER_Y,
+      "background",
+    );
+    background.setDepth(-100);
 
     // Title
     this.titleText = this.add
@@ -182,13 +178,13 @@ export class TradeScene extends Phaser.Scene {
     count?: number,
   ) {
     // Icon
-    const icon = this.add.sprite(100, y, iconKey);
+    const icon = this.add.sprite(130, y, iconKey);
     this.uiContainer.add(icon);
 
     // Inventory Count (optional)
     if (count !== undefined) {
       const countText = this.add
-        .text(50, y, `${count}`, STYLES.UI_LABEL)
+        .text(80, y, `${count}`, STYLES.UI_LABEL)
         .setOrigin(0.5);
       this.uiContainer.add(countText);
     }
@@ -221,7 +217,7 @@ export class TradeScene extends Phaser.Scene {
     const canAfford = this.gameStateManager.gold >= price;
     const buyBtnText = this.localeManager.get("TRADE_BUY");
     const buyBtn = this.add
-      .text(600, y, buyBtnText, {
+      .text(570, y, buyBtnText, {
         ...STYLES.UI_LABEL,
         fontSize: "28px",
         backgroundColor: canAfford ? "#2ecc71" : "#7f8c8d",
@@ -260,13 +256,13 @@ export class TradeScene extends Phaser.Scene {
       const sellPrice = Math.floor(item.buyPrice * 0.5);
 
       // Icon
-      const icon = this.add.sprite(100, currentY, item.icon);
+      const icon = this.add.sprite(130, currentY, item.icon);
       this.uiContainer.add(icon);
 
       // Inventory Count
       const count = this.gameStateManager.getItemCount(id);
       const countText = this.add
-        .text(50, currentY, `${count}`, STYLES.UI_LABEL)
+        .text(80, currentY, `${count}`, STYLES.UI_LABEL)
         .setOrigin(0.5);
       this.uiContainer.add(countText);
 
@@ -282,12 +278,7 @@ export class TradeScene extends Phaser.Scene {
       const priceY = nameText.y + nameText.displayHeight + 5;
 
       const priceLabel = this.add
-        .text(
-          180,
-          priceY,
-          this.localeManager.get("TRADE_PRICE"),
-          STYLES.PRICE,
-        )
+        .text(180, priceY, this.localeManager.get("TRADE_PRICE"), STYLES.PRICE)
         .setOrigin(0, 0);
       const priceValue = this.add
         .text(
@@ -307,7 +298,7 @@ export class TradeScene extends Phaser.Scene {
       // Sell Button
       const sellBtnText = this.localeManager.get("TRADE_SELL");
       const sellBtn = this.add
-        .text(600, currentY, sellBtnText, {
+        .text(570, currentY, sellBtnText, {
           ...STYLES.UI_LABEL,
           fontSize: "28px",
           backgroundColor: "#e74c3c",
