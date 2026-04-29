@@ -38,7 +38,7 @@ export class GridRenderer extends Phaser.Events.EventEmitter {
                     ISO_TILE_WIDTH / 2, ISO_TILE_HEIGHT,
                     0, ISO_TILE_HEIGHT / 2
                 ]);
-                tile.setInteractive(shape, Phaser.Geom.Polygon.Contains);
+                tile.setInteractive({ hitArea: shape, hitAreaCallback: Phaser.Geom.Polygon.Contains, useHandCursor: true });
 
                 tile.on('pointerdown', () => this.emit('tile-click', x, y));
                 this.tileSprites[x][y] = tile;
