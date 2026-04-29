@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { STYLES } from "../../constants/Styles";
 import { GameStateManager } from "../../managers/GameStateManager";
 import { LAYOUT } from "../../constants/Layout";
-import { ITEMS, ItemType } from "../../types";
+import { ITEMS, ItemType, PLANT_ITEMS, PLANT_ITEM_IDS } from "../../types";
 
 export class InventoryList extends Phaser.GameObjects.Container {
   private selectionFrames: Record<string, Phaser.GameObjects.Graphics> = {};
@@ -23,10 +23,9 @@ export class InventoryList extends Phaser.GameObjects.Container {
   }
 
   private createInventoryList() {
-    const plants = Object.values(ITEMS).filter(item => item.type === ItemType.Plant);
-    this.itemOrder = plants.map(p => p.id);
+    this.itemOrder = [...PLANT_ITEM_IDS];
 
-    plants.forEach((plant, index) => {
+    PLANT_ITEMS.forEach((plant, index) => {
       this.createInventoryItem(index, plant.id, plant.icon);
     });
   }
@@ -46,7 +45,7 @@ export class InventoryList extends Phaser.GameObjects.Container {
         LAYOUT.INVENTORY_SLOT_HEIGHT,
       )
       .setOrigin(0.5)
-      .setInteractive();
+      .setInteractive({ useHandCursor: true });
     zone.on("pointerdown", () => {
       this.gameStateManager.selectedItem = itemId;
       this.updateSelectionHighlight();

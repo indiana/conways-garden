@@ -86,7 +86,7 @@ export class TradeScene extends Phaser.Scene {
         padding: { x: 20, y: 10 },
       })
       .setOrigin(0.5)
-      .setInteractive()
+      .setInteractive({ useHandCursor: true })
       .on("pointerdown", () => {
         this.currentTab = type;
         this.refresh();
@@ -276,11 +276,73 @@ export class TradeScene extends Phaser.Scene {
         padding: { x: actionType === "BUY" ? 20 : 10, y: 10 },
       })
       .setOrigin(0.5)
-      .setInteractive();
+      .setInteractive({ useHandCursor: true });
 
     if (canAfford || actionType === "SELL") {
       actionBtn.on("pointerdown", onAction);
     }
-    this.uiContainer.add(actionBtn);
+
+    itemIds.forEach((id) => {
+      const item = ITEMS[id];
+      const sellPrice = Math.floor(item.buyPrice * 0.5);
+
+      // Icon
+      const icon = this.add.sprite(130, currentY, item.icon);
+      this.uiContainer.add(icon);
+
+      // Inventory Count
+      const count = this.gameStateManager.getItemCount(id);
+      const countText = this.add
+        .text(80, currentY, `${count}`, STYLES.UI_LABEL)
+        .setOrigin(0.5);
+      this.uiContainer.add(countText);
+
+      // Name & Price
+      const nameText = this.add
+        .text(180, currentY - 40, this.localeManager.get(item.displayNameKey), {
+          ...STYLES.BUTTON,
+          padding: { x: 0, y: 0 },
+          wordWrap: { width: 320 },
+        })
+        .setOrigin(0, 0);
+
+      const priceY = nameText.y + nameText.displayHeight + 5;
+
+      const priceLabel = this.add
+        .text(180, priceY, this.localeManager.get("TRADE_PRICE"), STYLES.PRICE)
+        .setOrigin(0, 0);
+      const priceValue = this.add
+        .text(
+          priceLabel.x + priceLabel.width,
+          priceY,
+          `${sellPrice}`,
+          STYLES.PRICE,
+        )
+        .setOrigin(0, 0);
+      const priceIcon = this.add
+        .sprite(priceValue.x + priceValue.width + 0, priceY + 12, "ui_gold")
+        .setOrigin(0, 0.5);
+      priceIcon.setScale(50 / priceIcon.width);
+
+      this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
+
+      // Sell Button
+      const sellBtnText = this.localeManager.get("TRADE_SELL");
+      const sellBtn = this.add
+        .text(570, currentY, sellBtnText, {
+          ...STYLES.UI_LABEL,
+          fontSize: "28px",
+          backgroundColor: "#e74c3c",
+          padding: { x: 10, y: 10 },
+        })
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", () => {
+          GameActions.sellItem(this.gameStateManager, id);
+        });
+      this.uiContainer.add(sellBtn);
+
+      currentY += LAYOUT.TRADE_ITEM_SPACING;
+    });
   }
 }

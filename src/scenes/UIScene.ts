@@ -86,44 +86,48 @@ export class UIScene extends Phaser.Scene {
           'ATLAS': 'AtlasScene'
       };
 
-      const mainScene = this.scene.get('MainScene');
-
-      // 1. Handle MainScene (Garden) separately
-      if (tab === 'GARDEN') {
-          if (mainScene.scene.isPaused()) {
-              this.scene.resume('MainScene');
-          }
-          this.scene.setVisible(true, 'MainScene');
-          this.scene.bringToTop('MainScene');
-      } else {
-          if (this.scene.isActive('MainScene') && !mainScene.scene.isPaused() && !mainScene.scene.isSleeping()) {
-              this.scene.pause('MainScene');
-          }
-          this.scene.setVisible(false, 'MainScene');
-      }
-
-      // 2. Handle other scenes
       Object.entries(tabs).forEach(([key, sceneKey]) => {
-          if (key === 'GARDEN') return;
-
-          const targetScene = this.scene.get(sceneKey);
           if (key === tab) {
-              if (targetScene.scene.isSleeping()) {
-                  this.scene.wake(sceneKey);
-              } else if (!this.scene.isActive(sceneKey)) {
-                  this.scene.launch(sceneKey);
-              }
-              this.scene.setVisible(true, sceneKey);
-              this.scene.bringToTop(sceneKey);
+              this.activateScene(key as NavTab, sceneKey);
           } else {
-              if (this.scene.isActive(sceneKey) && !targetScene.scene.isSleeping()) {
-                  this.scene.sleep(sceneKey);
-              }
-              this.scene.setVisible(false, sceneKey);
+              this.deactivateScene(key as NavTab, sceneKey);
           }
       });
 
       this.scene.bringToTop('UIScene');
+  }
+
+  private activateScene(tab: NavTab, sceneKey: string) {
+      if (tab === 'GARDEN') {
+          const mainScene = this.scene.get(sceneKey);
+          if (mainScene.scene.isPaused()) {
+              this.scene.resume(sceneKey);
+          }
+      } else {
+          const targetScene = this.scene.get(sceneKey);
+          if (targetScene.scene.isSleeping()) {
+              this.scene.wake(sceneKey);
+          } else if (!this.scene.isActive(sceneKey)) {
+              this.scene.launch(sceneKey);
+          }
+      }
+      this.scene.setVisible(true, sceneKey);
+      this.scene.bringToTop(sceneKey);
+  }
+
+  private deactivateScene(tab: NavTab, sceneKey: string) {
+      if (tab === 'GARDEN') {
+          const mainScene = this.scene.get(sceneKey);
+          if (this.scene.isActive(sceneKey) && !mainScene.scene.isPaused() && !mainScene.scene.isSleeping()) {
+              this.scene.pause(sceneKey);
+          }
+      } else {
+          const targetScene = this.scene.get(sceneKey);
+          if (this.scene.isActive(sceneKey) && !targetScene.scene.isSleeping()) {
+              this.scene.sleep(sceneKey);
+          }
+      }
+      this.scene.setVisible(false, sceneKey);
   }
 
   private updateGardenElementsVisibility() {

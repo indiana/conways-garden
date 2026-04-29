@@ -26,7 +26,7 @@ export class AchievementPopup extends Phaser.GameObjects.Container {
     this.bg = scene.add
       .rectangle(0, 0, 600, 120, 0x2d3436, 0.95)
       .setStrokeStyle(4, 0xf1c40f)
-      .setInteractive()
+      .setInteractive({ useHandCursor: true })
       .on("pointerdown", () => this.handleClick());
 
     // Icon
