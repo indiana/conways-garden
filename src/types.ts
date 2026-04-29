@@ -80,6 +80,9 @@ export const ITEMS: Record<string, Item> = {
     }
 };
 
+export const PLANT_ITEMS = Object.values(ITEMS).filter(item => item.type === ItemType.Plant);
+export const PLANT_ITEM_IDS = Object.freeze(PLANT_ITEMS.map(p => p.id));
+
 export const ACHIEVEMENTS: Record<string, Achievement> = {
     'first_steps': {
         id: 'first_steps',
