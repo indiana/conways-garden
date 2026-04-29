@@ -132,7 +132,7 @@ export class TradeScene extends Phaser.Scene {
     const itemIds = Object.keys(ITEMS);
     itemIds.forEach((id) => {
       const item = ITEMS[id];
-      this.renderBuyItem(
+      this.renderTradeItem(
         this.localeManager.get(item.displayNameKey),
         item.buyPrice,
         item.icon,
@@ -140,6 +140,7 @@ export class TradeScene extends Phaser.Scene {
         () => {
           GameActions.buyItem(this.gameStateManager, item.id);
         },
+        "BUY",
         this.gameStateManager.getItemCount(id),
       );
       currentY += LAYOUT.TRADE_ITEM_SPACING;
@@ -155,7 +156,7 @@ export class TradeScene extends Phaser.Scene {
       const isPurchased = this.gameStateManager.hasUpgrade(id);
 
       if (isUnlocked && !isPurchased) {
-        this.renderBuyItem(
+        this.renderTradeItem(
           this.localeManager.get(upgrade.displayNameKey),
           upgrade.cost,
           "tile_ground",
@@ -163,18 +164,58 @@ export class TradeScene extends Phaser.Scene {
           () => {
             GameActions.buyUpgrade(this.gameStateManager, id);
           },
+          "BUY",
         );
         currentY += LAYOUT.TRADE_ITEM_SPACING;
       }
     });
   }
 
-  private renderBuyItem(
+  private renderSellView() {
+    const itemIds = Object.keys(ITEMS).filter(
+      (id) => this.gameStateManager.getItemCount(id) > 0,
+    );
+    let currentY = LAYOUT.TRADE_LIST_START_Y;
+
+    if (itemIds.length === 0) {
+      const emptyText = this.add
+        .text(
+          LAYOUT.CENTER_X,
+          currentY,
+          this.localeManager.get("TRADE_EMPTY_SELL"),
+          STYLES.UI_LABEL,
+        )
+        .setOrigin(0.5);
+      this.uiContainer.add(emptyText);
+      return;
+    }
+
+    itemIds.forEach((id) => {
+      const item = ITEMS[id];
+      const sellPrice = Math.floor(item.buyPrice * 0.5);
+
+      this.renderTradeItem(
+        this.localeManager.get(item.displayNameKey),
+        sellPrice,
+        item.icon,
+        currentY,
+        () => {
+          GameActions.sellItem(this.gameStateManager, id);
+        },
+        "SELL",
+        this.gameStateManager.getItemCount(id),
+      );
+      currentY += LAYOUT.TRADE_ITEM_SPACING;
+    });
+  }
+
+  private renderTradeItem(
     name: string,
     price: number,
     iconKey: string,
     y: number,
-    onBuy: () => void,
+    onAction: () => void,
+    actionType: "BUY" | "SELL",
     count?: number,
   ) {
     // Icon
@@ -213,42 +254,32 @@ export class TradeScene extends Phaser.Scene {
 
     this.uiContainer.add([nameText, priceLabel, priceValue, priceIcon]);
 
-    // Buy Button
-    const canAfford = this.gameStateManager.gold >= price;
-    const buyBtnText = this.localeManager.get("TRADE_BUY");
-    const buyBtn = this.add
-      .text(570, y, buyBtnText, {
+    // Action Button
+    let btnText: string;
+    let bgColor: string;
+    let canAfford = true;
+
+    if (actionType === "BUY") {
+      canAfford = this.gameStateManager.gold >= price;
+      btnText = this.localeManager.get("TRADE_BUY");
+      bgColor = canAfford ? "#2ecc71" : "#7f8c8d";
+    } else {
+      btnText = this.localeManager.get("TRADE_SELL");
+      bgColor = "#e74c3c";
+    }
+
+    const actionBtn = this.add
+      .text(570, y, btnText, {
         ...STYLES.UI_LABEL,
         fontSize: "28px",
-        backgroundColor: canAfford ? "#2ecc71" : "#7f8c8d",
-        padding: { x: 20, y: 10 },
+        backgroundColor: bgColor,
+        padding: { x: actionType === "BUY" ? 20 : 10, y: 10 },
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    if (canAfford) {
-      buyBtn.on("pointerdown", onBuy);
-    }
-    this.uiContainer.add(buyBtn);
-  }
-
-  private renderSellView() {
-    const itemIds = Object.keys(ITEMS).filter(
-      (id) => this.gameStateManager.getItemCount(id) > 0,
-    );
-    let currentY = LAYOUT.TRADE_LIST_START_Y;
-
-    if (itemIds.length === 0) {
-      const emptyText = this.add
-        .text(
-          LAYOUT.CENTER_X,
-          currentY,
-          this.localeManager.get("TRADE_EMPTY_SELL"),
-          STYLES.UI_LABEL,
-        )
-        .setOrigin(0.5);
-      this.uiContainer.add(emptyText);
-      return;
+    if (canAfford || actionType === "SELL") {
+      actionBtn.on("pointerdown", onAction);
     }
 
     itemIds.forEach((id) => {
