@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { ITEMS, ItemType } from "../types";
+import { ITEMS, ItemType, PLANT_ITEMS } from "../types";
 import { LocaleManager } from "../managers/LocaleManager";
 import { LAYOUT } from "../constants/Layout";
 import { ScrollablePanel } from "../ui/components/ScrollablePanel";
@@ -61,9 +61,7 @@ export class AtlasScene extends Phaser.Scene {
     const container = this.scrollPanel.getContainer();
     this.scrollPanel.clearContent();
 
-    const plants = Object.values(ITEMS).filter(
-      (item) => item.type === ItemType.Plant,
-    );
+    const plants = PLANT_ITEMS;
     let currentY = LAYOUT.SCROLL_TOP + 10;
 
     plants.forEach((plant, index) => {
