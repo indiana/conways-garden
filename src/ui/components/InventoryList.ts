@@ -46,7 +46,7 @@ export class InventoryList extends Phaser.GameObjects.Container {
         LAYOUT.INVENTORY_SLOT_HEIGHT,
       )
       .setOrigin(0.5)
-      .setInteractive();
+      .setInteractive({ useHandCursor: true });
     zone.on("pointerdown", () => {
       this.gameStateManager.selectedItem = itemId;
       this.updateSelectionHighlight();

@@ -86,7 +86,7 @@ export class TradeScene extends Phaser.Scene {
         padding: { x: 20, y: 10 },
       })
       .setOrigin(0.5)
-      .setInteractive()
+      .setInteractive({ useHandCursor: true })
       .on("pointerdown", () => {
         this.currentTab = type;
         this.refresh();
@@ -224,7 +224,7 @@ export class TradeScene extends Phaser.Scene {
         padding: { x: 20, y: 10 },
       })
       .setOrigin(0.5)
-      .setInteractive();
+      .setInteractive({ useHandCursor: true });
 
     if (canAfford) {
       buyBtn.on("pointerdown", onBuy);
@@ -305,7 +305,7 @@ export class TradeScene extends Phaser.Scene {
           padding: { x: 10, y: 10 },
         })
         .setOrigin(0.5)
-        .setInteractive()
+        .setInteractive({ useHandCursor: true })
         .on("pointerdown", () => {
           GameActions.sellItem(this.gameStateManager, id);
         });

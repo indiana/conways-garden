@@ -34,7 +34,7 @@ export class TopBar extends Phaser.GameObjects.Container {
 
     const hitArea = scene.add
       .zone(menuX, menuY, menuSize + 20, menuSize + 20)
-      .setInteractive();
+      .setInteractive({ useHandCursor: true });
     hitArea.on("pointerdown", () => this.onMenuClick());
 
     this.add([this.goldText, this.goldIcon, menuGraphics, hitArea]);
