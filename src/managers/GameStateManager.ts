@@ -36,6 +36,7 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
     }
 
     public addGold(amount: number) {
+        if (amount <= 0) return;
         this.state.gold += amount;
         this.state.totalGoldEarned += amount;
         this.emit(Events.GOLD_CHANGED, this.state.gold);
@@ -43,6 +44,7 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
     }
 
     public spendGold(amount: number): boolean {
+        if (amount <= 0) return false;
         if (this.state.gold >= amount) {
             this.state.gold -= amount;
             this.emit(Events.GOLD_CHANGED, this.state.gold);
@@ -52,6 +54,7 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
     }
 
     public addItem(itemId: string, count: number = 1) {
+        if (count <= 0) return;
         if (!this.state.inventory[itemId]) {
             this.state.inventory[itemId] = 0;
         }
@@ -60,6 +63,7 @@ export class GameStateManager extends Phaser.Events.EventEmitter {
     }
 
     public removeItem(itemId: string, count: number = 1): boolean {
+        if (count <= 0) return false;
         if (this.state.inventory[itemId] >= count) {
             this.state.inventory[itemId] -= count;
             this.emit(Events.INVENTORY_CHANGED, this.state.inventory);
