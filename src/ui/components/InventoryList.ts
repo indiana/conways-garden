@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { STYLES } from "../../constants/Styles";
 import { GameStateManager } from "../../managers/GameStateManager";
 import { LAYOUT } from "../../constants/Layout";
-import { ITEMS, ItemType, PLANT_ITEMS, PLANT_ITEM_IDS } from "../../types";
+import { PLANT_ITEMS, PLANT_ITEM_IDS } from "../../types";
 
 export class InventoryList extends Phaser.GameObjects.Container {
   private selectionFrames: Record<string, Phaser.GameObjects.Graphics> = {};

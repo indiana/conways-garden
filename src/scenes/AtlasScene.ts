@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { ITEMS, ItemType, PLANT_ITEMS } from "../types";
+import { PLANT_ITEMS } from "../types";
 import { LocaleManager } from "../managers/LocaleManager";
 import { LAYOUT } from "../constants/Layout";
 import { ScrollablePanel } from "../ui/components/ScrollablePanel";

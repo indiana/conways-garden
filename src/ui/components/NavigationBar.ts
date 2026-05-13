@@ -47,6 +47,12 @@ export class NavigationBar extends Phaser.GameObjects.Container {
             this.updateVisuals();
             this.onTabSwitch(tab);
         });
+        btn.on('pointerover', () => {
+            btn.setAlpha(0.8);
+        });
+        btn.on('pointerout', () => {
+            btn.setAlpha(1.0);
+        });
         return btn;
     }
 

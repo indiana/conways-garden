@@ -32,10 +32,28 @@ export class TopBar extends Phaser.GameObjects.Container {
     const menuSize = 40;
     const menuGraphics = scene.add.graphics();
 
+    // Hamburger lines
+    menuGraphics.lineStyle(4, 0xffffff, 1);
+    const mY = menuY - menuSize / 2;
+    menuGraphics.beginPath();
+    menuGraphics.moveTo(menuX - menuSize / 2, mY + 10);
+    menuGraphics.lineTo(menuX + menuSize / 2, mY + 10);
+    menuGraphics.moveTo(menuX - menuSize / 2, mY + 20);
+    menuGraphics.lineTo(menuX + menuSize / 2, mY + 20);
+    menuGraphics.moveTo(menuX - menuSize / 2, mY + 30);
+    menuGraphics.lineTo(menuX + menuSize / 2, mY + 30);
+    menuGraphics.strokePath();
+
     const hitArea = scene.add
       .zone(menuX, menuY, menuSize + 20, menuSize + 20)
       .setInteractive({ useHandCursor: true });
     hitArea.on("pointerdown", () => this.onMenuClick());
+    hitArea.on("pointerover", () => {
+        menuGraphics.setAlpha(0.8);
+    });
+    hitArea.on("pointerout", () => {
+        menuGraphics.setAlpha(1.0);
+    });
 
     this.add([this.goldText, this.goldIcon, menuGraphics, hitArea]);
 

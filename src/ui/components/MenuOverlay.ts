@@ -34,7 +34,9 @@ export class MenuOverlay extends Phaser.GameObjects.Container {
             .on('pointerdown', () => {
                 onReset();
                 this.toggle();
-            });
+            })
+            .on('pointerover', () => this.resetBtn.setAlpha(0.8))
+            .on('pointerout', () => this.resetBtn.setAlpha(1.0));
 
         this.langBtn = scene.add.text(LAYOUT.CENTER_X, LAYOUT.CENTER_Y + 40, '', { ...STYLES.UI_LABEL, color: '#ffffff' })
             .setOrigin(0.5)
@@ -42,7 +44,9 @@ export class MenuOverlay extends Phaser.GameObjects.Container {
             .on('pointerdown', () => {
                 const nextLocale = this.localeManager.getLocale() === 'PL' ? 'EN' : 'PL';
                 this.localeManager.setLocale(nextLocale);
-            });
+            })
+            .on('pointerover', () => this.langBtn.setAlpha(0.8))
+            .on('pointerout', () => this.langBtn.setAlpha(1.0));
 
         this.add([bg, panel, this.resetBtn, this.langBtn]);
         
