@@ -41,12 +41,29 @@ export class NavigationBar extends Phaser.GameObjects.Container {
 
     private createNavButton(x: number, y: number, key: string, tab: NavTab) {
         const btn = this.scene.add.sprite(x, y, key).setInteractive({ useHandCursor: true });
-        btn.setScale(160 / btn.width);
+        const baseScale = 160 / btn.width;
+        btn.setScale(baseScale);
+
+        btn.on('pointerover', () => {
+            btn.setTint(0xdddddd);
+        });
+
+        btn.on('pointerout', () => {
+            btn.clearTint();
+            btn.setScale(baseScale);
+        });
+
         btn.on('pointerdown', () => {
+            btn.setScale(baseScale * 0.95);
             this.activeTab = tab;
             this.updateVisuals();
             this.onTabSwitch(tab);
         });
+
+        btn.on('pointerup', () => {
+            btn.setScale(baseScale);
+        });
+
         return btn;
     }
 
